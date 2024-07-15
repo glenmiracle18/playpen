@@ -15,7 +15,7 @@ export const Sidebar = () => {
 
 const sidebarList = [
   { icon: Grid2X2, label: "All media" },
-  { icon: User, label: "All media" },
+  { icon: User, label: "Members" },
   { icon: Smile, label: "My media" },
   { icon: Plus, label: "New board" },
 ];

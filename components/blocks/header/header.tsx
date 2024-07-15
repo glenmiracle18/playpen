@@ -1,8 +1,18 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, Search, UploadCloud } from "lucide-react";
+import {
+  getKindeServerSession,
+  LoginLink,
+  RegisterLink,
+} from "@kinde-oss/kinde-auth-nextjs/server";
+import { UserNav } from "@/components/user-nav";
+import { Button } from "@/components/ui/button";
 
-export const Header = () => {
+export const Header = async () => {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
+
   return (
     <div className="h-20 items-center px-6 justify-between flex  border-b-2 shadow-sm">
       {/* user */}
@@ -29,10 +39,24 @@ export const Header = () => {
           <UploadCloud size="13" className="text-gray-400" />
         </div>
 
-        <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
+        {user ? (
+          <UserNav
+            email={user.email as string}
+            name={user.given_name as string}
+            userImage={
+              user.picture ?? `https://avatar.vercel.sh/${user.given_name}`
+            }
+          />
+        ) : (
+          <div className="flex items-center gap-x-2">
+            <Button asChild>
+              <LoginLink>Login</LoginLink>
+            </Button>
+            <Button variant="secondary" asChild>
+              <RegisterLink>Register</RegisterLink>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
