@@ -9,7 +9,7 @@ import {
 import { UserNav } from "@/components/user-nav";
 import { Button } from "@/components/ui/button";
 
-export const Header = async () => {
+const Navbar = async () => {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
@@ -61,3 +61,5 @@ export const Header = async () => {
     </div>
   );
 };
+
+export default Navbar;
