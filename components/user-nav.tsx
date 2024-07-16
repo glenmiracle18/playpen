@@ -32,7 +32,7 @@ export function UserNav({ email, name, userImage }: iAppProps) {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-56 mr-4" align="center" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{name}</p>
@@ -59,8 +59,8 @@ export function UserNav({ email, name, userImage }: iAppProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Button
-            className="flex gap-2 w-full cursor-pointer items-start justify-start"
-            variant="destructive"
+            className="flex gap-2 w-full cursor-pointer text-red-500 items-start bg-white justify-start hover:text-red-700"
+            // variant="destructive"
           >
             <LogOutIcon size="20" />
             <LogoutLink>Log out</LogoutLink>

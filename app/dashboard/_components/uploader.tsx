@@ -67,9 +67,12 @@ const Uploader = () => {
             "image/png": [".png"],
             "image/jpeg": [".jpeg"],
             "image/jpg": [".jpg"],
+            "apllication/pdf": [".pdf"],
           }}
+          maxFiles={5}
           onDragEnter={() => setIsDragOver(true)}
           onDragLeave={() => setIsDragOver(false)}
+          multiple={true}
         >
           {({ getRootProps, getInputProps }) => (
             <div

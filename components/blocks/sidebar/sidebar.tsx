@@ -1,21 +1,68 @@
-import { Grid2X2, User, Smile, Plus } from "lucide-react";
+"use client";
+import {
+  Grid2X2,
+  ScanFace,
+  User,
+  Smile,
+  Plus,
+  Folder,
+  Home,
+  GlobeIcon,
+  CircleHelp,
+  Settings,
+} from "lucide-react";
 import { SidebarItem } from "./sidebar-item";
+import { ProfileDropdown } from "./profile-dropdown";
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export const Sidebar = () => {
+  const [activeItem, setActiveItem] = useState<string>("Home");
+  const router = useRouter();
+
+  const handleItemClick = (label: string, path?: string) => {
+    router.push(path!);
+    setActiveItem(label);
+  };
   return (
-    <div className="w-[290px] z-50 bg-gray-200/20 border-r-2 left-0 h-screen p-4">
-      <div className="flex flex-col gap-2 w-full">
-        {sidebarList.map((item, idx) => (
-          <SidebarItem key={item.label} icon={item.icon} label={item.label!} />
-        ))}
+    <div className="w-[260px] z-50 bg-gray-200/50 rounded-sm border-r left-0 flex flex-col justify-between h-screen p-4">
+      <div className="flex flex-col gap-4 w-full ">
+        <ProfileDropdown />
+        <div className="mt-4 flex flex-col gap-2 w-full">
+          {sidebarList.map((item, idx) => (
+            <div
+              key={item.label}
+              onClick={() => handleItemClick(item.label, item.path)}
+            >
+              <SidebarItem
+                isActive={activeItem == item.label}
+                icon={item.icon}
+                label={item.label!}
+              />
+            </div>
+          ))}
+        </div>
+        <hr className="w-full px-4" />
+        <div onClick={() => handleItemClick("browser")}>
+          <SidebarItem
+            label="Open in browser"
+            icon={GlobeIcon}
+            isActive={activeItem == "browser"}
+          />
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <SidebarItem icon={CircleHelp} label="Support" />
+        <SidebarItem icon={Settings} label="Settings" />
       </div>
     </div>
   );
 };
 
 const sidebarList = [
-  { icon: Grid2X2, label: "All media" },
-  { icon: User, label: "Members" },
-  { icon: Smile, label: "My media" },
-  { icon: Plus, label: "New board" },
+  { icon: Home, label: "Home", path: "/dashboard" },
+  { icon: ScanFace, label: "My Projects", path: "/dashboard/myprojects" },
+  { icon: Folder, label: "Folders", path: "/dashboard/myprojects" },
+  { icon: Grid2X2, label: "All Files", path: "/dashboard/myprojects" },
 ];
