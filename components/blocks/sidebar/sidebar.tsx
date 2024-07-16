@@ -1,15 +1,12 @@
 "use client";
 import {
-  Grid2X2,
   ScanFace,
-  User,
-  Smile,
-  Plus,
   Folder,
   Home,
   GlobeIcon,
   CircleHelp,
   Settings,
+  LayoutGrid,
 } from "lucide-react";
 import { SidebarItem } from "./sidebar-item";
 import { ProfileDropdown } from "./profile-dropdown";
@@ -64,5 +61,5 @@ const sidebarList = [
   { icon: Home, label: "Home", path: "/dashboard" },
   { icon: ScanFace, label: "My Projects", path: "/dashboard/myprojects" },
   { icon: Folder, label: "Folders", path: "/dashboard/myprojects" },
-  { icon: Grid2X2, label: "All Files", path: "/dashboard/myprojects" },
+  { icon: LayoutGrid, label: "All Files", path: "/dashboard/myprojects" },
 ];
