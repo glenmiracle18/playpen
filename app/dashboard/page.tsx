@@ -12,6 +12,7 @@ import {
   UserRoundPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ResourceItem } from "./_components/resource-item";
 
 const creationList = [
   { icon: FilePlus, label: "New document" },
@@ -34,7 +35,7 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className=" p-4 mt-4 gap-4 mr-2 flex flex-col">
+    <div className=" p-4 mt-4 gap-4 mr-2 ml-4 flex flex-col">
       <div className="flex items-center gap-4">
         {creationList.map((item, idx) => (
           <CreationCard key={idx} label={item.label} icon={item.icon} />
@@ -59,7 +60,11 @@ const DashboardPage = () => {
               {item.label}
             </div>
           ))}
-          <div></div>
+        </div>
+        <div className="mt-4 grid grid-cols-3 gap-2 h-[430px] overflow-y-scroll overflow-x-auto ">
+          {resourceList.map((item, idx) => (
+            <ResourceItem key={idx} />
+          ))}
         </div>
       </div>
     </div>
@@ -67,3 +72,5 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
+
+const resourceList = [1, 2, 3, 4, 5, 6, 7, 8];
