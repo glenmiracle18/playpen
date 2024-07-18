@@ -7,6 +7,7 @@ import {
   CircleHelp,
   Settings,
   LayoutGrid,
+  GitPullRequestCreateArrow,
 } from "lucide-react";
 import { SidebarItem } from "./sidebar-item";
 import { ProfileDropdown } from "./profile-dropdown";
@@ -43,8 +44,8 @@ export const Sidebar = () => {
         <hr className="w-full px-4" />
         <div onClick={() => handleItemClick("browser")}>
           <SidebarItem
-            label="Open in browser"
-            icon={GlobeIcon}
+            label="Changelogs"
+            icon={GitPullRequestCreateArrow}
             isActive={activeItem == "browser"}
           />
         </div>
