@@ -1,0 +1,86 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model File {
+  file_id     String        @id @default(uuid())
+  user_id     String
+  folder      Folder[]
+  folder_id   String?
+  file_name   String
+  file_path   String
+  file_type   String
+  file_size   Int
+  uploaded_at DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  is_shared   Boolean       @default(false)
+  shares      FileSharing[]
+
+  Category Category[]
+
+  Favorite Favorite[]
+}
+
+model Folder {
+  folder_id        String   @id @default(uuid())
+  user_id          String
+  folder_name      String
+  parent_folder_id String? // self-referencing relationship for sub-folders
+  parent_folder    Folder?  @relation("SubFolders", fields: [parent_folder_id], references: [folder_id])
+  sub_folder       Folder[] @relation("SubFolders")
+  files            File[] // reationdhip to files
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+}
+
+model FileSharing {
+  share_id            String      @id @default(uuid())
+  file_id             String
+  file                File        @relation(fields: [file_id], references: [file_id])
+  shared_with_user_id String
+  shared_at           DateTime    @default(now())
+  access_level        AccessLevel
+}
+
+model Category {
+  category_id   String @id @default(uuid())
+  user_id       String
+  category_name String
+  files         File[]
+}
+
+model Favorite {
+  favorite_id String   @id @default(uuid())
+  user_id     String
+  file_id     String
+  file        File     @relation(fields: [file_id], references: [file_id])
+  created_at  DateTime @default(now())
+}
+
+model ActivityLog {
+  log_id    String   @id @default(uuid())
+  user_id   String
+  action    String
+  timestamp DateTime @default(now())
+  details   String?
+}
+
+model Setting {
+  user_id       String
+  setting_name  String
+  setting_value String
+
+  @@id([user_id, setting_name]) // Composite primary key
+}
+
+enum AccessLevel {
+  VIEW
+  EDIT
+  COMMENT
+}
