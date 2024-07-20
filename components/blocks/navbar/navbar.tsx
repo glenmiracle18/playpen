@@ -1,12 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import {
-  Bell,
-  ChevronDown,
-  EllipsisVertical,
-  Search,
-  UploadCloud,
-} from "lucide-react";
+import { Bell, EllipsisVertical, Search } from "lucide-react";
 import {
   getKindeServerSession,
   LoginLink,

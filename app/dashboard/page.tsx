@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ResourceItem } from "./_components/resource-item";
+import { NewFolderModal } from "./_components/new-folder-modal";
 
 const creationList = [
   { icon: FilePlus, label: "New document" },
@@ -36,6 +37,7 @@ const DashboardPage = () => {
 
   return (
     <div className=" p-4 mt-4 gap-4 mr-2 ml-4 flex flex-col">
+      <NewFolderModal />
       <div className="flex items-center gap-4">
         {creationList.map((item, idx) => (
           <CreationCard key={idx} label={item.label} icon={item.icon} />
