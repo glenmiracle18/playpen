@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,55 +21,36 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { createFolder } from "@/app/actions/actions";
+import { FormSubmitButton } from "./submit-button";
+import { formSchema } from "@/app/validations/folder-validation";
+import { useAction } from "next-safe-action/hooks";
 import { Loader } from "lucide-react";
-
-const formSchema = z.object({
-  folderName: z.string().min(2, {
-    message: "Folder name must be at least 2 characters.",
-  }),
-});
-
-async function createFolder(
-  values: { folderName: string },
-  toast: any,
-  setLoading: (loading: boolean) => void,
-) {
-  try {
-    setLoading(true);
-    console.log("Creating folder with values:", values);
-    const response = await fetch("/api/folder", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to create folder");
-    }
-    toast({
-      description: `✅ ${values.folderName} Folder created`,
-    });
-    console.log(`✅ ${values.folderName} Folder created`);
-  } catch (error) {
-    console.error("Error:", error);
-    toast({
-      description: `🚫 There was an error`,
-      status: "error",
-    });
-  } finally {
-    setLoading(false);
-  }
-}
 
 // main render
 export function NewFolderModal() {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLFormElement>(null);
+  const { executeAsync, result, isExecuting } = useAction(createFolder, {
+    onSuccess() {
+      ref.current?.reset();
+      setIsOpen(false);
+      toast({
+        description: `✅ folder created`,
+      });
+    },
+    onError(error) {
+      console.log("error", error);
+      toast({
+        description: `🚫 there was an error`,
+      });
+      setIsOpen(true);
+    },
+  });
 
+  // form validation here, so that I don't have to do it int the sercer
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -76,16 +58,12 @@ export function NewFolderModal() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      await createFolder(values, toast, setLoading);
-    } catch (error) {
-      console.error("Error:", error);
-    }
+  async function handleSubmit(values: any) {
+    const result = await executeAsync(form.getValues());
   }
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="w-[100px] px-4" variant="secondary">
           Create Folder
@@ -99,7 +77,11 @@ export function NewFolderModal() {
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            ref={ref}
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-8"
+          >
             <FormField
               control={form.control}
               name="folderName"
@@ -113,8 +95,12 @@ export function NewFolderModal() {
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={loading}>
-              {loading ? <Loader className="animate-spin size-7" /> : "Submit"}
+            <Button type="submit" disabled={isExecuting}>
+              {isExecuting ? (
+                <Loader className="animate-spin size-7" />
+              ) : (
+                "Submit"
+              )}
             </Button>
           </form>
         </Form>
