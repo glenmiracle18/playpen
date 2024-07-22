@@ -23,7 +23,6 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { useRef, useState } from "react";
 import { createFolder } from "@/app/actions/actions";
-import { FormSubmitButton } from "./submit-button";
 import { formSchema } from "@/app/validations/folder-validation";
 import { useAction } from "next-safe-action/hooks";
 import { Loader } from "lucide-react";
@@ -99,7 +98,7 @@ export function NewFolderModal() {
               {isExecuting ? (
                 <Loader className="animate-spin size-7" />
               ) : (
-                "Submit"
+                "Create"
               )}
             </Button>
           </form>
