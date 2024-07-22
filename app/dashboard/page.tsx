@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ResourceItem } from "./_components/resource-item";
 import { NewFolderModal } from "./_components/new-folder-modal";
+import { AllFolders } from "./_components/all-folders";
 
 const creationList = [
   { icon: FilePlus, label: "New document" },
@@ -29,6 +30,8 @@ const sortingList = [
   { label: "External" },
   { label: "Archived" },
 ];
+
+// ts ignore
 const DashboardPage = () => {
   const [sortingActive, setSortingActice] = useState("Recents");
   const hanldeSortingItemClick = (label: string) => {
@@ -37,12 +40,14 @@ const DashboardPage = () => {
 
   return (
     <div className=" p-4 mt-4 gap-4 mr-2 ml-4 flex flex-col">
-      <NewFolderModal />
-      <div className="flex items-center gap-4">
+      <NewFolderModal label="New Folder" icon={FolderPlus} />
+
+      {/* TODO: check this in the future */}
+      {/* <div className="flex items-center gap-4">
         {creationList.map((item, idx) => (
           <CreationCard key={idx} label={item.label} icon={item.icon} />
         ))}
-      </div>
+      </div> */}
 
       <div className="mt-4 flex flex-col gap-4">
         <h1 className="text-sm font-semibold">All Folders</h1>
@@ -63,6 +68,7 @@ const DashboardPage = () => {
             </div>
           ))}
         </div>
+        <AllFolders />
         <div className="mt-4 grid grid-cols-3 gap-2 h-[430px] overflow-y-scroll overflow-x-auto ">
           {resourceList.map((item, idx) => (
             <ResourceItem key={idx} />

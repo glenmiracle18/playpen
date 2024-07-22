@@ -4,6 +4,7 @@ import { actionClient } from "@/lib/safe-action";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { revalidatePath } from "next/cache";
 import { formSchema } from "../validations/folder-validation";
+import { NextResponse } from "next/server";
 
 export const createFolder = actionClient
   .schema(formSchema)
@@ -28,3 +29,15 @@ export const createFolder = actionClient
     }
     revalidatePath("/dashboard");
   });
+
+// getFolders
+export const getFolders = actionClient.action(async () => {
+  try {
+    const folders = await prisma.folder.findMany();
+    // would rather just return it like this instead of NextResponse.json
+    return { data: folders };
+  } catch (e) {
+    console.error("Folders Error:", e);
+    return { error: "Failed to fetch folders" };
+  }
+});
