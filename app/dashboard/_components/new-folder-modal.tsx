@@ -38,6 +38,7 @@ export const NewFolderModal = ({ icon: Icon, label }: NewFolderModalProps) => {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLFormElement>(null);
+
   const { executeAsync, result, isExecuting } = useAction(createFolder, {
     onSuccess() {
       ref.current?.reset();

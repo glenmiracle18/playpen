@@ -22,17 +22,5 @@ export const AllFolders = () => {
 
   console.log(data);
 
-  return (
-    <div>
-      {/* {data ? (
-        <ul>
-          {data.map((folder) => (
-            <li key={folder.id}>{folder.name}</li>
-          ))}
-        </ul>
-      ) : (
-        <div>No folders found</div>
-      )} */}
-    </div>
-  );
+  return <div></div>;
 };
