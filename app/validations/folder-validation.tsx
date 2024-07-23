@@ -5,3 +5,8 @@ export const formSchema = z.object({
     message: "Folder name must be at least 2 characters.",
   }),
 });
+
+export const fileSchema = z.object({
+  folderId: z.string().min(2),
+  isShared: z.boolean(),
+});

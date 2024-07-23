@@ -67,8 +67,8 @@ export const NewFolderModal = ({ icon: Icon, label }: NewFolderModalProps) => {
     },
   });
 
-  async function handleSubmit(values: any) {
-    const result = await execute(form.getValues());
+  function handleSubmit(values: any) {
+    const result = execute(form.getValues());
   }
 
   return (
