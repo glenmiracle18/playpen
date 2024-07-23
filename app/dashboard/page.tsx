@@ -68,11 +68,11 @@ const DashboardPage = () => {
             </div>
           ))}
         </div>
-        <AllFolders />
-        <div className="mt-4 grid grid-cols-3 gap-2 h-[430px] overflow-y-scroll overflow-x-auto ">
-          {resourceList.map((item, idx) => (
+        <div>
+          <AllFolders />
+          {/* {resourceList.map((item, idx) => (
             <ResourceItem key={idx} />
-          ))}
+          ))} */}
         </div>
       </div>
     </div>

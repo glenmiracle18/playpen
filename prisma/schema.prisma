@@ -39,7 +39,7 @@ model Folder {
   folder_id        String   @id @default(uuid())
   user_id          String
   folder_name      String
-  parent_folder_id String? // self-referencing relationship for sub-folders
+  parent_folder_id String?  @unique // self-referencing relationship for sub-folders
   parent_folder    Folder?  @relation("SubFolders", fields: [parent_folder_id], references: [folder_id])
   sub_folder       Folder[] @relation("SubFolders")
   files            File[] // reationdhip to files

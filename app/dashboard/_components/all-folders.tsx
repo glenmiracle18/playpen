@@ -2,6 +2,7 @@
 import { getFolders } from "@/app/actions/actions";
 import { useAction } from "next-safe-action/hooks";
 import { useEffect } from "react";
+import { ResourceItem } from "./resource-item";
 
 export const AllFolders = () => {
   const { executeAsync, isExecuting, result, hasErrored } =
@@ -9,7 +10,10 @@ export const AllFolders = () => {
 
   useEffect(() => {
     executeAsync();
-  }, []); // Ensure the dependency array is correct
+  }, []);
+  // Ensure the dependency array is correct
+  // TODO: add a dependency array, that always checks the db to see if the folder has changed, to update it life
+  // can also do revalidate the path, when a new folder is created or updated
 
   if (isExecuting) {
     return <div>Loading...</div>;
@@ -20,7 +24,18 @@ export const AllFolders = () => {
   }
   const { data, serverError } = result;
 
-  console.log(data);
+  // console.log(data?.data?.[0].folder_name);
 
-  return <div></div>;
+  return (
+    // TODO: add scroll bar and static element
+    <div className="mt-4 grid grid-cols-3 gap-2 h-[430px]  ">
+      {data?.data?.map((folder, idx) => (
+        <ResourceItem
+          url={`/dashboard/folder/${folder.folder_id}`}
+          name={folder.folder_name}
+          key={idx}
+        />
+      ))}
+    </div>
+  );
 };

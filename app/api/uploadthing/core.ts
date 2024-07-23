@@ -5,10 +5,11 @@ import { UploadThingError } from "uploadthing/server";
 const f = createUploadthing();
 
 export const ourFileRouter = {
-  imageUploader: f({
+  fileUploader: f({
     image: { maxFileSize: "4GB", maxFileCount: 10 },
     pdf: { maxFileSize: "4GB", maxFileCount: 4 },
-    video: { maxFileSize: "1GB" },
+    video: { maxFileSize: "1GB", maxFileCount: 4 },
+    audio: { maxFileSize: "1024B", maxFileCount: 4 },
   })
     .middleware(async ({ req }) => {
       const { getUser } = getKindeServerSession();

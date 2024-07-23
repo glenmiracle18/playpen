@@ -27,6 +27,7 @@ import { formSchema } from "@/app/validations/folder-validation";
 import { useAction } from "next-safe-action/hooks";
 import { Loader } from "lucide-react";
 import { Folder, LucideIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type NewFolderModalProps = {
   icon: LucideIcon;
@@ -38,14 +39,16 @@ export const NewFolderModal = ({ icon: Icon, label }: NewFolderModalProps) => {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLFormElement>(null);
+  const router = useRouter();
 
-  const { executeAsync, result, isExecuting } = useAction(createFolder, {
+  const { execute, result, isExecuting } = useAction(createFolder, {
     onSuccess() {
       ref.current?.reset();
       setIsOpen(false);
       toast({
         description: `✅ folder created`,
       });
+      router.refresh();
     },
     onError(error) {
       console.log("error", error);
@@ -65,7 +68,7 @@ export const NewFolderModal = ({ icon: Icon, label }: NewFolderModalProps) => {
   });
 
   async function handleSubmit(values: any) {
-    const result = await executeAsync(form.getValues());
+    const result = await execute(form.getValues());
   }
 
   return (

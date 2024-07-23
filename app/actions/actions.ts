@@ -27,7 +27,7 @@ export const createFolder = actionClient
       console.log("Folders Error: ", e);
       throw new Error("Failed to create folder");
     }
-    revalidatePath("/dashboard");
+    // revalidatePath("/dashboard", "page");
   });
 
 // getFolders
