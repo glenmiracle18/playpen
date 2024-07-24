@@ -7,10 +7,11 @@ import { useTransition } from "react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import Dropzone, { type FileRejection } from "react-dropzone";
-import { Loader2, MousePointerSquareDashed, Image } from "lucide-react";
+import { Loader2, MousePointerSquareDashed, ImageIcon } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 const Uploader = () => {
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
@@ -19,18 +20,22 @@ const Uploader = () => {
   const router = useRouter();
   const [isPending, setIsPending] = useTransition();
   const { toast } = useToast();
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
 
   // handle upload state
-  const { startUpload, isUploading } = useUploadThing("imageUploader", {
+  const { startUpload, isUploading } = useUploadThing("fileUploader", {
     onClientUploadComplete: ([data]) => {
       toast({
         description: "✅ Upload coomplete successfully.",
       });
       setUploadComplete(true);
       startTransition(() => {
-        router.push("/dashboard");
+        router.refresh();
       });
+      console.log(data.url);
+      setFileUrl(data.url);
     },
+
     onUploadProgress(p) {
       setIsUploadProgress(p);
     },
@@ -55,7 +60,7 @@ const Uploader = () => {
   return (
     <div
       className={cn(
-        "relative h-[50px] flex-1 my-16 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:rounded-2xl flex flex-col justify-center items-center",
+        "relative h-[200px] flex-1 my-16 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:rounded-2xl flex flex-col justify-center items-center ",
         { "ring-blue-900/25 bg-blue-900/10 border-dashed": isDragOver },
       )}
     >
@@ -86,7 +91,7 @@ const Uploader = () => {
               ) : isUploading || isPending ? (
                 <Loader2 className="animate-spin size-6 text-zinc-500 mb-2" />
               ) : (
-                <Image className="size-6 text-zinc-500 mb-2" />
+                <ImageIcon className="size-6 text-zinc-500 mb-2" />
               )}
 
               <div className="flex flex-col justify-center mb-2 text-sm text-zinc-700">
@@ -121,7 +126,15 @@ const Uploader = () => {
             </div>
           )}
         </Dropzone>
+        <Button variant="outline" type="submit" className="mt-8">
+          Upload Files
+        </Button>
       </div>
+      {fileUrl ? (
+        <Image alt="uploaded image" src={fileUrl} width="200" height="100" />
+      ) : (
+        <p> image will appear here </p>
+      )}
     </div>
   );
 };

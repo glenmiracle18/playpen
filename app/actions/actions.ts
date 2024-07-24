@@ -44,7 +44,7 @@ export const getFolders = actionClient.action(async () => {
 });
 
 // getFiles by folderId
-export const getFiles = actionClient
+export const getFilesAction = actionClient
   .schema(
     z.object({
       folderId: z.string(),
@@ -69,3 +69,5 @@ export const getFiles = actionClient
       return new NextResponse("Internal Server Error", { status: 500 });
     }
   });
+
+// create/upload files actions
