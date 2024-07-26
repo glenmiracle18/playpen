@@ -13,3 +13,4 @@ TECH
 
 
 - why is my git contribution graph not working
+-- another day to suubmit a bunch of code and fix my streak
