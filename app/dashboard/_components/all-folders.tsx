@@ -10,7 +10,7 @@ export const AllFolders = () => {
 
   useEffect(() => {
     executeAsync();
-  }, []);
+  }, [executeAsync]);
   // Ensure the dependency array is correct
   // TODO: add a dependency array, that always checks the db to see if the folder has changed, to update it life
   // can also do revalidate the path, when a new folder is created or updated
@@ -28,12 +28,12 @@ export const AllFolders = () => {
 
   return (
     // TODO: add scroll bar and static element
-    <div className="mt-4 grid grid-cols-3 gap-2 h-[430px]  ">
+    <div className="mt-4 grid grid-cols-3 gap-2 ">
       {data?.data?.map((folder, idx) => (
         <ResourceItem
           url={`/dashboard/folder/${folder.folder_id}`}
           name={folder.folder_name}
-          key={idx}
+          key={folder.folder_name}
         />
       ))}
     </div>

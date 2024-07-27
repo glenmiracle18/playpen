@@ -1,4 +1,4 @@
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, FolderIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -10,18 +10,19 @@ export const ResourceItem = ({ name, url }: ResourceItemProps) => {
   return (
     <Link
       href={url}
-      className=" cursor-pointer p-2 flex-col gap-2 flex w-[280px] md:w-[350px]"
+      className=" cursor-pointer p-2  gap-2  w-[280px] md:w-[350px]"
     >
-      <div className="relative bg-gray-300/20 justify-center items-center py-8 px-16 rounded-md">
-        <EllipsisVertical className="absolute top-4 right-4 size-4 text-gray-500 cursor-pointer hover:text-red-400" />
-        <Image src="/water.jpeg" alt="resource" width={300} height={200} />
-      </div>
-      <div className="flex justify-between items-start px-4">
-        <span className="flex flex-col gap-[4px]">
-          <h1 className="font-medium text-sm text-black">{name}</h1>
-          <p className="text-xs text-gray-300">size</p>
-        </span>
-        <h1 className="text-gray-300 text-sm">92MB</h1>
+      <div className="hover:bg-gray-400/20 bg-gray-300/20 justify-center items-center py-4 px-6 rounded-xl">
+        <div className="flex justify-between items-center px-4">
+          <span className="flex items-center gap-[8px]">
+            <FolderIcon className="size-10 text-red-500 font-medium" />
+            <div>
+              <h1 className="font-medium text-sm text-black">{name}</h1>
+              <h1 className="text-gray-300 text-xs">92MB</h1>
+            </div>
+          </span>
+          <EllipsisVertical className="text-bold top-4 items-center right-4 size-4 text-gray-500 cursor-pointer hover:text-red-400" />
+        </div>
       </div>
     </Link>
   );

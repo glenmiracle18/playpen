@@ -6,6 +6,7 @@ import { useAction } from "next-safe-action/hooks";
 import { useParams, usePathname } from "next/navigation";
 import { startTransition, useEffect } from "react";
 import Uploader from "../../_components/uploader";
+import { useState } from "react";
 
 const FolderPage = () => {
   const pathname = useParams();
