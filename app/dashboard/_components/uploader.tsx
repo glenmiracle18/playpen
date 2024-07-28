@@ -1,6 +1,5 @@
 "use client";
-import { useUploadThing } from "@/lib/uploadthing";
-import { UploadButton } from "@/utils/uploadthing";
+import { useUploadThing } from "@/utils/uploadthing";
 import { useRouter } from "next/navigation";
 import { startTransition } from "react";
 import { useTransition } from "react";
@@ -12,8 +11,14 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useAction } from "next-safe-action/hooks";
+import { uploadFileAction, UploadFileType } from "@/app/actions/actions";
 
-const Uploader = () => {
+interface UploaderProps {
+  folderId: string;
+}
+
+const Uploader = ({ folderId }: UploaderProps) => {
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
   const [uploadComplete, setUploadComplete] = useState<boolean>(false);
   const [uploadProgress, setIsUploadProgress] = useState<number>(0);
@@ -21,6 +26,20 @@ const Uploader = () => {
   const [isPending, setIsPending] = useTransition();
   const { toast } = useToast();
   const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const { execute, result, isExecuting } = useAction(uploadFileAction, {
+    onSuccess() {
+      toast({
+        description: "✅ file created",
+      });
+      router.refresh();
+    },
+    onError(error) {
+      console.log("error", error);
+      toast({
+        description: "🚫 there was an error",
+      });
+    },
+  });
 
   // handle upload state
   const { startUpload, isUploading } = useUploadThing("fileUploader", {
@@ -32,14 +51,42 @@ const Uploader = () => {
       startTransition(() => {
         router.refresh();
       });
-      console.log(data.url);
+      console.log(data);
+
+      const filePath = data.url;
+      const payload: UploadFileType = {
+        values: {
+          file_name: data.name,
+          folder_id: folderId,
+          file_type: data.type,
+          file_size: data.size,
+          file_path: filePath,
+        }, // place the values in a payload
+      };
+      const result = execute({ values: payload.values });
       setFileUrl(data.url);
     },
-
     onUploadProgress(p) {
       setIsUploadProgress(p);
     },
   });
+
+  //  update the db here
+  //   const onSubmit = async () => {
+  //     const filePath = data.url;
+  //     const payload: UploadFileType = {
+  //       values: {
+  //         file_name: data.name,
+  //         folder_id: folderId,
+  //         file_type: data.type,
+  //         file_size: data.size,
+  //         file_path: filePath,
+  //       }, // place the values in a payload
+  //     };
+  //     const result = execute({ values: payload.values });
+  //   };
+  //   setFileUrl(data.url);
+  // },
 
   const onDropRejected = (rejectedFiles: FileRejection[]) => {
     const [file] = rejectedFiles;

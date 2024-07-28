@@ -7,39 +7,22 @@ import { useParams, usePathname } from "next/navigation";
 import { startTransition, useEffect } from "react";
 import Uploader from "../../_components/uploader";
 import { useState } from "react";
+import UploadForm from "../../_components/upload-form";
+import prisma from "@/lib/db";
+import { getFolders } from "@/app/actions/actions";
 
 const FolderPage = () => {
   const pathname = useParams();
   // console.log(pathname.folderId);
   const folderId = `${pathname.folderId}`;
+  const [file, setFile] = useState(null);
 
   return (
     <div className="p-6 h-screen w-full">
-      <Uploader />
+      <Uploader folderId={folderId} />
+      {/* <UploadForm folderId={folderId} /> */}
     </div>
   );
 };
 
 export default FolderPage;
-
-// get all files
-// const { execute, input, hasErrored, result, isExecuting } = useAction(
-//   getFiles,
-//   {
-//     onSuccess() {
-//       console.log("success");
-//       toast({
-//         title: `❇️ Suuccess`,
-//         description: ` There is an error on the server`,
-//       });
-//     },
-//     onError(error) {
-//       console.log("error", error);
-//       toast({
-//         variant: "destructive",
-//         title: `🚫 Error`,
-//         description: ` There is an error on the server`,
-//       });
-//     },
-//   },
-// );

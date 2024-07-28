@@ -1,10 +1,11 @@
 "use client";
-import * as z from "zod";
-import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
+import { uploadFileAction, type uploadFileSchema } from "@/app/actions/actions";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -13,38 +14,54 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { ImageIcon, Pencil, PlusCircle } from "lucide-react";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { toast } from "@/components/ui/use-toast";
+import { cn } from "@/lib/utils";
+import type { File } from "@prisma/client";
+import { ImageIcon, Pencil, PlusCircle } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
+import Image from "next/image";
+import { useState } from "react";
 import { FileUpload } from "./file_upload";
 
 // interface props
 interface UploadFormProps {
-  initialData: Course;
   folderId: string;
 }
 
 // form schema
 const formSchema = z.object({
-  filePath: z.string().min(1, {
-    message: "File is required",
+  file_path: z.string().min(1, {
+    message: "file is required",
   }),
 });
 
 // functional component
-const UploadForm = ({ initialData, courseId }: UploadFormProps) => {
+const UploadForm = ({ folderId }: UploadFormProps) => {
   // state for editing mode
   const [isEditing, setIsEditing] = useState(false);
   const toggleEdit = () => setIsEditing((current) => !current);
+
+  const { execute, result, isExecuting } = useAction(uploadFileAction, {
+    onSuccess() {
+      console.log("successfully created folder");
+      toast({
+        description: "✅ file uploaded",
+      });
+      router.refresh();
+    },
+    onError(error) {
+      console.log("error", error);
+      toast({
+        description: "🚫 there was an error",
+      });
+    },
+  });
 
   // form hook
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      filePath: "",
+      file_path: "",
     },
   });
 
@@ -54,45 +71,29 @@ const UploadForm = ({ initialData, courseId }: UploadFormProps) => {
 
   // form methods
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      await axios.patch(`/api/courses/${courseId}`, values);
-      toast({
-        description: "✅ Upload coomplete successfully.",
-      });
-      toggleEdit();
-      router.refresh();
-    } catch (error) {
-      console.log(error);
-      toast({
-        description: "🚫 Unsupported file type.",
-      });
-    }
+    const filePath = form.getValues().file_path;
+    type PayloadType = {
+      values: typeof uploadFileSchema;
+    };
+    const payload: PayloadType = {
+      values: {
+        file_name: "asdf",
+        folder_id: folderId,
+        file_type: "img",
+        file_size: 24,
+        file_path: filePath,
+      }, // place the values in a payload
+    };
+    const result = execute(payload.values);
   };
 
   return (
     <div className="mt-6 border bg-slate-100 rounded-md p-4 ">
       <div className="font-medium flex items-center justify-between">
         Add a file
-        <Button variant="ghost" onClick={toggleEdit}>
-          {isEditing && <>Cancel</>}
-
-          {!isEditing && !initialData.fileUrl && (
-            <>
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Add an image
-            </>
-          )}
-
-          {!isEditing && initialData.fileUrl && (
-            <>
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit image
-            </>
-          )}
-        </Button>
       </div>
       {!isEditing &&
-        (!initialData.fileUrl ? (
+        (!initialData.file_path ? (
           <div className="flex items-center justify-center h-60 bg-slate-200 rounded-md">
             <ImageIcon className="h-10 w-10 text-slate-500" />
           </div>
@@ -102,7 +103,7 @@ const UploadForm = ({ initialData, courseId }: UploadFormProps) => {
               alt="Upload"
               fill
               className="rounded-md object-cover"
-              src={initialData.fileUrl}
+              src={initialData.file_path}
             />
           </div>
         ))}
@@ -113,13 +114,10 @@ const UploadForm = ({ initialData, courseId }: UploadFormProps) => {
             endpoint="fileUploader"
             onChange={(url) => {
               if (url) {
-                onSubmit({ url: fileurl });
+                onSubmit({ file_path: url });
               }
             }}
           />
-          <div className="text-xs text-muted-foreground mt-4">
-            16:9 aspect ration recommended
-          </div>
         </div>
       )}
     </div>
