@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useAction } from "next-safe-action/hooks";
-import { uploadFileAction, UploadFileType } from "@/app/actions/actions";
+import { uploadFileAction, type UploadFileType } from "@/app/actions/actions";
 
 interface UploaderProps {
   folderId: string;
@@ -70,23 +70,6 @@ const Uploader = ({ folderId }: UploaderProps) => {
       setIsUploadProgress(p);
     },
   });
-
-  //  update the db here
-  //   const onSubmit = async () => {
-  //     const filePath = data.url;
-  //     const payload: UploadFileType = {
-  //       values: {
-  //         file_name: data.name,
-  //         folder_id: folderId,
-  //         file_type: data.type,
-  //         file_size: data.size,
-  //         file_path: filePath,
-  //       }, // place the values in a payload
-  //     };
-  //     const result = execute({ values: payload.values });
-  //   };
-  //   setFileUrl(data.url);
-  // },
 
   const onDropRejected = (rejectedFiles: FileRejection[]) => {
     const [file] = rejectedFiles;
