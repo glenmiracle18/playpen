@@ -88,6 +88,7 @@ const Uploader = ({ folderId }: UploaderProps) => {
   };
 
   return (
+    <div>
     <div
       className={cn(
         "relative h-[200px] flex-1 my-16 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:rounded-2xl flex flex-col justify-center items-center ",
@@ -156,10 +157,12 @@ const Uploader = ({ folderId }: UploaderProps) => {
             </div>
           )}
         </Dropzone>
-        <Button variant="outline" type="submit" className="mt-8">
+        {/* TODO: add the functionality of adding mulitple or a single file and before uploading so that some files can be removed or still added */}
+        {/* <Button variant="outline" type="submit" className="mt-8">
           Upload Files
-        </Button>
+        </Button> */}
       </div>
+    </div>
       {fileUrl ? (
         <Image alt="uploaded image" src={fileUrl} width="200" height="100" />
       ) : (

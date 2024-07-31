@@ -44,6 +44,12 @@ export const getFolders = actionClient.action(async () => {
 });
 
 // getFiles by folderId
+//
+
+function serializeData(data: any): any {
+  return JSON.parse(JSON.stringify(data));
+}
+
 export const getFilesAction = actionClient
   .schema(
     z.object({
@@ -63,7 +69,8 @@ export const getFilesAction = actionClient
           folder_id: folderId,
         },
       });
-      return NextResponse.json(files);
+
+      return { data: files };
     } catch (e) {
       console.log("[GET_FILES: ]", e);
       return new NextResponse("Internal Server Error", { status: 500 });
