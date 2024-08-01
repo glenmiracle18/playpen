@@ -26,6 +26,7 @@ export const AllFolders = () => {
 
   // console.log(data?.data?.[0].folder_name);
 
+  // @ts-ignore
   return (
     // TODO: add scroll bar and static element
     <div className="mt-4 grid md:grid-cols-2 lg:grid-cols-3 gap-2 grid-cols-1 ">

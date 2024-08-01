@@ -34,21 +34,29 @@ export const createFolder = actionClient
 // getFolders
 export const getFolders = actionClient.action(async () => {
   try {
+    const { getUser } = getKindeServerSession();
+    const user = await getUser();
+
+    // if (!user || !user.id) {
+    //   return NextResponse.json("Unauthorized", { status: 401 });
+    // }
     const folders = await prisma.folder.findMany();
     // would rather just return it like this instead of NextResponse.json
     return { data: folders };
   } catch (e) {
     console.error("Folders Error:", e);
-    return { error: "Failed to fetch folders" };
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 });
 
 // getFiles by folderId
 //
-
-function serializeData(data: any): any {
-  return JSON.parse(JSON.stringify(data));
-}
+// will generally be returning plain js, since I hace next-safe-action
+// as NextResponse is interfering with my return value type.
+// I'll rather throw a new error in my catch block'
 
 export const getFilesAction = actionClient
   .schema(
@@ -61,9 +69,9 @@ export const getFilesAction = actionClient
       const { getUser } = getKindeServerSession();
       const user = await getUser();
 
-      if (!user || !user.id) {
-        return new NextResponse("Unauthorized", { status: 401 });
-      }
+      // if (!user || !user.id) {
+      //   return NextResponse.json("Unauthorized", { status: 401 });
+      // }
       const files = await prisma.file.findMany({
         where: {
           folder_id: folderId,
@@ -73,7 +81,7 @@ export const getFilesAction = actionClient
       return { data: files };
     } catch (e) {
       console.log("[GET_FILES: ]", e);
-      return new NextResponse("Internal Server Error", { status: 500 });
+      return { error: "Failed to fetch files" };
     }
   });
 
@@ -115,6 +123,9 @@ export const uploadFileAction = actionClient
       return { data: files };
     } catch (e) {
       console.log("Upload Files: ", e);
-      return new NextResponse("Internal Server Error", { status: 500 });
+      return NextResponse.json(
+        { error: "Internal Server Error" },
+        { status: 500 },
+      );
     }
   });
