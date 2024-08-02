@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useAction } from "next-safe-action/hooks";
 import { uploadFileAction, type UploadFileType } from "@/app/actions/actions";
+import { revalidatePath } from "next/cache";
 
 interface UploaderProps {
   folderId: string;
@@ -29,7 +30,7 @@ const Uploader = ({ folderId }: UploaderProps) => {
   const { execute, result, isExecuting } = useAction(uploadFileAction, {
     onSuccess() {
       toast({
-        description: "✅ file uploaded sucessfully",
+        description: "✅ file written in db sucessfully",
       });
       router.refresh();
     },
@@ -45,12 +46,11 @@ const Uploader = ({ folderId }: UploaderProps) => {
   const { startUpload, isUploading } = useUploadThing("fileUploader", {
     onClientUploadComplete: ([data]) => {
       toast({
-        description: "✅ Upload coomplete successfully.",
+        description: "✅ Upload coomplete",
       });
       setUploadComplete(true);
-      startTransition(() => {
-        router.refresh();
-      });
+      // revalidatePath(`/folder/${folderId}`);
+      router.refresh();
       console.log(data);
 
       const filePath = data.url;
