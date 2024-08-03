@@ -26,7 +26,7 @@ import { createFolder } from "@/app/actions/actions";
 import { formSchema } from "@/app/validations/folder-validation";
 import { useAction } from "next-safe-action/hooks";
 import { Loader } from "lucide-react";
-import { Folder, LucideIcon } from "lucide-react";
+import { Folder, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type NewFolderModalProps = {
@@ -46,14 +46,14 @@ export const NewFolderModal = ({ icon: Icon, label }: NewFolderModalProps) => {
       ref.current?.reset();
       setIsOpen(false);
       toast({
-        description: `✅ folder created`,
+        description: "✅ folder created",
       });
-      router.refresh();
+      router.push("/dashboard");
     },
     onError(error) {
       console.log("error", error);
       toast({
-        description: `🚫 there was an error`,
+        description: "🚫 there was an error",
       });
       setIsOpen(true);
     },

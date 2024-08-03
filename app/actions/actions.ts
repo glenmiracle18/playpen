@@ -7,6 +7,7 @@ import { fileSchema, formSchema } from "../validations/folder-validation";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+// createFolder action
 export const createFolder = actionClient
   .schema(formSchema)
   .action(async ({ parsedInput: { folderName } }) => {
@@ -24,6 +25,7 @@ export const createFolder = actionClient
           user_id: user.id,
         },
       });
+      revalidatePath("/dashboard");
     } catch (e) {
       console.log("Folders Error: ", e);
       throw new Error("Failed to create folder");
@@ -37,9 +39,9 @@ export const getFolders = actionClient.action(async () => {
     const { getUser } = getKindeServerSession();
     const user = await getUser();
 
-    // if (!user || !user.id) {
-    //   return NextResponse.json("Unauthorized", { status: 401 });
-    // }
+    if (!user || !user.id) {
+      return NextResponse.json("Unauthorized", { status: 401 });
+    }
     const folders = await prisma.folder.findMany();
     // would rather just return it like this instead of NextResponse.json
     return { data: folders };

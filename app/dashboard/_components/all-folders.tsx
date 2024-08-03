@@ -29,7 +29,7 @@ export const AllFolders = () => {
   // @ts-ignore
   return (
     // TODO: add scroll bar and static element
-    <div className="mt-4 grid md:grid-cols-2 lg:grid-cols-3 gap-2 grid-cols-1 ">
+    <div className="mt-4 grid md:grid-cols-2 lg:grid-cols-2 gap-2 grid-cols-1 ">
       {data?.data?.map((folder, idx) => (
         <ResourceItem
           url={`/dashboard/folder/${folder.folder_id}`}
