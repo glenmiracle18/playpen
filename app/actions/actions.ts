@@ -42,7 +42,11 @@ export const getFolders = actionClient.action(async () => {
     if (!user || !user.id) {
       return NextResponse.json("Unauthorized", { status: 401 });
     }
-    const folders = await prisma.folder.findMany();
+    const folders = await prisma.folder.findMany({
+      orderBy: {
+        created_at: "desc",
+      },
+    });
     // would rather just return it like this instead of NextResponse.json
     return { data: folders };
   } catch (e) {
@@ -77,6 +81,9 @@ export const getFilesAction = actionClient
       const files = await prisma.file.findMany({
         where: {
           folder_id: folderId,
+        },
+        orderBy: {
+          uploaded_at: "desc",
         },
       });
 
