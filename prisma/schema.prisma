@@ -19,7 +19,6 @@ model User {
 model File {
   file_id     String        @id @default(uuid())
   user_id     String
-  folder      Folder[]
   folder_id   String?
   file_name   String
   file_path   String
@@ -28,47 +27,39 @@ model File {
   uploaded_at DateTime      @default(now())
   updated_at  DateTime      @updatedAt
   is_shared   Boolean       @default(false)
+  is_favorite Boolean       @default(false)
   shares      FileSharing[]
-
-  Category Category[]
-
-  Favorite Favorite[]
+  Category    Category[]    @relation("CategoryToFile")
+  folder      Folder[]      @relation("FileToFolder")
 }
 
 model Folder {
   folder_id        String   @id @default(uuid())
   user_id          String
   folder_name      String
-  parent_folder_id String?  @unique // self-referencing relationship for sub-folders
-  parent_folder    Folder?  @relation("SubFolders", fields: [parent_folder_id], references: [folder_id])
-  sub_folder       Folder[] @relation("SubFolders")
-  files            File[] // reationdhip to files
+  parent_folder_id String?  @unique
+  is_favorite      Boolean  @default(false)
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
+  parent_folder    Folder?  @relation("SubFolders", fields: [parent_folder_id], references: [folder_id])
+  sub_folder       Folder?  @relation("SubFolders")
+  files            File[]   @relation("FileToFolder")
 }
 
 model FileSharing {
   share_id            String      @id @default(uuid())
   file_id             String
-  file                File        @relation(fields: [file_id], references: [file_id])
   shared_with_user_id String
   shared_at           DateTime    @default(now())
   access_level        AccessLevel
+  file                File        @relation(fields: [file_id], references: [file_id])
 }
 
 model Category {
   category_id   String @id @default(uuid())
   user_id       String
   category_name String
-  files         File[]
-}
-
-model Favorite {
-  favorite_id String   @id @default(uuid())
-  user_id     String
-  file_id     String
-  file        File     @relation(fields: [file_id], references: [file_id])
-  created_at  DateTime @default(now())
+  files         File[] @relation("CategoryToFile")
 }
 
 model ActivityLog {
@@ -84,7 +75,7 @@ model Setting {
   setting_name  String
   setting_value String
 
-  @@id([user_id, setting_name]) // Composite primary key
+  @@id([user_id, setting_name])
 }
 
 enum AccessLevel {

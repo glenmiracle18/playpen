@@ -15,23 +15,53 @@ import {
   StarIcon,
 } from "lucide-react";
 import Image from "next/image";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { markFavoriteFilesAction } from "@/app/actions/actions";
+import { toast } from "@/components/ui/use-toast";
+import { useState } from "react";
+import { useAction } from "next-safe-action/hooks";
+import { cn } from "@/lib/utils";
 
 interface FileProps {
-  data: File;
+  file: File;
 }
 
-export const IndividualFile = ({ data }: FileProps) => {
+export const IndividualFile = ({ file }: FileProps) => {
+  const [addedToFav, setAddedToFav] = useState<boolean>(false);
   // truncating function
   function truncateTitle(title: string, wordLimit: number) {
     const words = title.split(" ");
     if (words.length > wordLimit) {
-      return words.slice(0, wordLimit).join(" ") + "...";
+      return words.slice(0, wordLimit).join(` `) + `...`;
     }
     return title;
   }
 
-  const longTitle = `${data.file_name}`;
+  const longTitle = file.file_name as string;
   const truncatedTitle = truncateTitle(longTitle, 1);
+
+  const file_id = file.file_id;
+
+  // add to fav
+  const { execute, isExecuting } = useAction(markFavoriteFilesAction, {
+    onSuccess() {
+      toast({
+        description: "💚 file has been added to favorites",
+      });
+    },
+    onError(error) {
+      console.log("error", error);
+      toast({
+        variant: "destructive",
+        description: "failed to add file to favs",
+      });
+    },
+  });
+
+  const hanldedAddToFav = () => {
+    execute({ file_id });
+    setAddedToFav(true);
+  };
 
   return (
     <div>
@@ -40,8 +70,8 @@ export const IndividualFile = ({ data }: FileProps) => {
           <span className="sr-only">View</span>
         </Link>
         <Image
-          src={data.file_path}
-          alt="Image1"
+          src={file.file_path}
+          alt="Image"
           width={300}
           height={300}
           className="object-cover w-full aspect-square transition-all group-hover:scale-105"
@@ -63,9 +93,19 @@ export const IndividualFile = ({ data }: FileProps) => {
                 <BookmarkIcon className="h-4 w-4 mr-2" />
                 Save
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <StarIcon className="h-4 w-4 mr-2" />
-                Add to favorites
+              <DropdownMenuItem asChild>
+                <Button
+                  variant="ghost"
+                  onClick={() => hanldedAddToFav()}
+                  disabled={isExecuting || addedToFav}
+                >
+                  <StarIcon
+                    className={cn("h-4 w-4 mr-2", {
+                      "text-red-600 animate-pulse": addedToFav,
+                    })}
+                  />
+                  Add to favorites
+                </Button>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>

@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
 import { useRef, useState } from "react";
-import { createFolder } from "@/app/actions/actions";
+import { createFolder, getFolders } from "@/app/actions/actions";
 import { formSchema } from "@/app/validations/folder-validation";
 import { useAction } from "next-safe-action/hooks";
 import { Loader } from "lucide-react";
@@ -49,6 +49,7 @@ export const NewFolderModal = ({ icon: Icon, label }: NewFolderModalProps) => {
         description: "✅ folder created",
       });
       router.push("/dashboard");
+      window.location.reload(); // this is a hack, I should use react-query to refetch the data
     },
     onError(error) {
       console.log("error", error);

@@ -51,6 +51,8 @@ const Uploader = ({ folderId }: UploaderProps) => {
       setUploadComplete(true);
       // revalidatePath(`/folder/${folderId}`);
       router.refresh();
+      window.location.reload(); // this is a hack, I should use react-query to refetch the data
+
       console.log(data);
 
       const filePath = data.url;

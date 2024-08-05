@@ -75,9 +75,9 @@ export const getFilesAction = actionClient
       const { getUser } = getKindeServerSession();
       const user = await getUser();
 
-      // if (!user || !user.id) {
-      //   return NextResponse.json("Unauthorized", { status: 401 });
-      // }
+      if (!user || !user.id) {
+        return NextResponse.json("Unauthorized", { status: 401 });
+      }
       const files = await prisma.file.findMany({
         where: {
           folder_id: folderId,
@@ -132,6 +132,68 @@ export const uploadFileAction = actionClient
       return { data: files };
     } catch (e) {
       console.log("Upload Files: ", e);
+      return NextResponse.json(
+        { error: "Internal Server Error" },
+        { status: 500 },
+      );
+    }
+  });
+
+// get favorite files
+export const getFavoriteFilesAction = actionClient.action(async () => {
+  try {
+    const { getUser } = getKindeServerSession();
+    const user = await getUser();
+
+    if (!user || !user.id) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const files = await prisma.file.findMany({
+      where: {
+        is_favorite: true,
+      },
+    });
+    return { data: files };
+  } catch (e) {
+    console.log("Favorite Files: ", e);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
+  }
+});
+
+// create favorite files
+export const markFavoriteFilesAction = actionClient
+  .schema(
+    z.object({
+      file_id: z.string(),
+    }),
+  )
+  .action(async ({ parsedInput: { file_id } }) => {
+    try {
+      const { getUser } = getKindeServerSession();
+      const user = await getUser();
+
+      if (!user || !user.id) {
+        return new NextResponse("Unauthorized", { status: 401 });
+      }
+
+      const favoriteFiles = await prisma.file.update({
+        where: {
+          file_id: file_id,
+
+          // is_favorite: false, // this will be added later on
+        },
+        data: {
+          is_favorite: true,
+        },
+      });
+
+      return { success: true, message: "File marked as favorite" };
+    } catch (e) {
+      console.log("Favorite Files: ", e);
       return NextResponse.json(
         { error: "Internal Server Error" },
         { status: 500 },

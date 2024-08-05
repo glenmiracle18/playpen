@@ -39,7 +39,7 @@ const FolderPage = () => {
       ) : (
         <div className="flex-grow overflow-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 md:p-6">
           {allFile?.map((file) => (
-            <IndividualFile key={file.file_id} data={file} />
+            <IndividualFile key={file.file_id} file={file} />
           ))}
         </div>
       )}
