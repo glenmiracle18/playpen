@@ -32,7 +32,8 @@ const Uploader = ({ folderId }: UploaderProps) => {
       toast({
         description: "✅ file written in db sucessfully",
       });
-      router.refresh();
+      window.location.reload(); // this is a hack, I should use react-query to refetch the data
+      // router.refresh
     },
     onError(error) {
       console.log("error", error);
@@ -51,7 +52,6 @@ const Uploader = ({ folderId }: UploaderProps) => {
       setUploadComplete(true);
       // revalidatePath(`/folder/${folderId}`);
       router.refresh();
-      window.location.reload(); // this is a hack, I should use react-query to refetch the data
 
       console.log(data);
 

@@ -40,7 +40,7 @@ export const getFolders = actionClient.action(async () => {
     const user = await getUser();
 
     if (!user || !user.id) {
-      return NextResponse.json("Unauthorized", { status: 401 });
+      throw new Error("Unauthorized");
     }
     const folders = await prisma.folder.findMany({
       orderBy: {
@@ -76,7 +76,7 @@ export const getFilesAction = actionClient
       const user = await getUser();
 
       if (!user || !user.id) {
-        return NextResponse.json("Unauthorized", { status: 401 });
+        throw new Error("Unauthorized");
       }
       const files = await prisma.file.findMany({
         where: {
@@ -114,7 +114,7 @@ export const uploadFileAction = actionClient
       const user = await getUser();
 
       if (!user || !user.id) {
-        return new NextResponse("Unauthorized", { status: 401 });
+        throw new Error("Unauthorized");
       }
 
       const files = await prisma.file.create({
@@ -146,7 +146,7 @@ export const getFavoriteFilesAction = actionClient.action(async () => {
     const user = await getUser();
 
     if (!user || !user.id) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      throw new Error("Unauthorized");
     }
 
     const files = await prisma.file.findMany({
@@ -177,7 +177,7 @@ export const markFavoriteFilesAction = actionClient
       const user = await getUser();
 
       if (!user || !user.id) {
-        return new NextResponse("Unauthorized", { status: 401 });
+        throw new Error("Unauthorized");
       }
 
       const favoriteFiles = await prisma.file.update({
@@ -194,6 +194,43 @@ export const markFavoriteFilesAction = actionClient
       return { success: true, message: "File marked as favorite" };
     } catch (e) {
       console.log("Favorite Files: ", e);
+      return NextResponse.json(
+        { error: "Internal Server Error" },
+        { status: 500 },
+      );
+    }
+  });
+
+// add folders to favorite
+export const markFavoriteFolderAction = actionClient
+  .schema(
+    z.object({
+      folder_id: z.string(),
+    }),
+  )
+  .action(async ({ parsedInput: { folder_id } }) => {
+    try {
+      const { getUser } = getKindeServerSession();
+      const user = await getUser();
+
+      if (!user || !user.id) {
+        throw new Error("Unauthorized");
+      }
+
+      const favoriteFolders = await prisma.folder.update({
+        where: {
+          folder_id: folder_id,
+
+          // is_favorite: false, // this will be added later on
+        },
+        data: {
+          is_favorite: true,
+        },
+      });
+
+      return { success: true, message: "Folder marked as favorite" };
+    } catch (e) {
+      console.log("Favorite Folder: ", e);
       return NextResponse.json(
         { error: "Internal Server Error" },
         { status: 500 },

@@ -34,6 +34,7 @@ export const AllFolders = () => {
         <ResourceItem
           url={`/dashboard/folder/${folder.folder_id}`}
           name={folder.folder_name}
+          folder_id={folder.folder_id}
           key={folder.folder_name}
         />
       ))}
