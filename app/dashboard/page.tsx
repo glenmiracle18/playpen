@@ -69,10 +69,7 @@ const DashboardPage = () => {
           ))}
         </div>
         <div>
-          <AllFolders />
-          {/* {resourceList.map((item, idx) => (
-            <ResourceItem key={idx} />
-          ))} */}
+          <AllFolders state={sortingActive} />
         </div>
       </div>
     </div>

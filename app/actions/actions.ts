@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { fileSchema, formSchema } from "../validations/folder-validation";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { constants } from "buffer";
 
 // createFolder action
 export const createFolder = actionClient
@@ -34,29 +35,57 @@ export const createFolder = actionClient
   });
 
 // getFolders
-export const getFolders = actionClient.action(async () => {
-  try {
-    const { getUser } = getKindeServerSession();
-    const user = await getUser();
+export const getFoldersAction = actionClient
+  .schema(
+    z.object({
+      state: z.string().optional(),
+    }),
+  )
+  .action(async ({ parsedInput: { state } }) => {
+    try {
+      const { getUser } = getKindeServerSession();
+      const user = await getUser();
 
-    if (!user || !user.id) {
-      throw new Error("Unauthorized");
+      if (!user || !user.id) {
+        throw new Error("Unauthorized");
+      }
+
+      let folderQuery: any = {};
+
+      if (state?.toLowerCase() === "favorites") {
+        folderQuery = {
+          orderBy: {
+            created_at: "desc",
+          },
+          where: {
+            user_id: user.id,
+            is_favorite: true,
+          },
+        };
+      } else {
+        folderQuery = {
+          orderBy: {
+            created_at: "desc",
+          },
+          where: {
+            user_id: user.id,
+          },
+        };
+      }
+      console.log(folderQuery);
+      console.log(state);
+
+      const folders = await prisma.folder.findMany(folderQuery);
+      // would rather just return it like this instead of NextResponse.json
+      return { data: folders };
+    } catch (e) {
+      console.error("Folders Error:", e);
+      return NextResponse.json(
+        { error: "Internal Server Error" },
+        { status: 500 },
+      );
     }
-    const folders = await prisma.folder.findMany({
-      orderBy: {
-        created_at: "desc",
-      },
-    });
-    // would rather just return it like this instead of NextResponse.json
-    return { data: folders };
-  } catch (e) {
-    console.error("Folders Error:", e);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 },
-    );
-  }
-});
+  });
 
 // getFiles by folderId
 //
@@ -237,3 +266,25 @@ export const markFavoriteFolderAction = actionClient
       );
     }
   });
+
+// get favorite files
+export const getFavoriteFoldersAction = actionClient.action(async () => {
+  try {
+    const { getUser } = getKindeServerSession();
+    const user = await getUser();
+
+    if (!user || !user.id) {
+      throw new Error("Unauthorized");
+    }
+
+    const folders = await prisma.folder.findMany({
+      where: {
+        is_favorite: true,
+      },
+    });
+    return { data: folders };
+  } catch (e) {
+    console.log("Favorite folder: ", e);
+    throw new Error("Internal Server Error");
+  }
+});
