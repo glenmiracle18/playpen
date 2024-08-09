@@ -62,6 +62,15 @@ export const getFoldersAction = actionClient
             is_favorite: true,
           },
         };
+      } else if (state?.toLowerCase() === "recents") {
+        folderQuery = {
+          orderBy: {
+            created_at: "desc",
+          },
+          where: {
+            user_id: user.id,
+          },
+        };
       } else {
         folderQuery = {
           orderBy: {
@@ -72,8 +81,6 @@ export const getFoldersAction = actionClient
           },
         };
       }
-      console.log(folderQuery);
-      console.log(state);
 
       const folders = await prisma.folder.findMany(folderQuery);
       // would rather just return it like this instead of NextResponse.json

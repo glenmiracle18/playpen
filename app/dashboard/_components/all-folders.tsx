@@ -32,8 +32,6 @@ export const AllFolders = ({ state }: AllFoldersProps) => {
     queryFn: () => getFoldersAction({ state }),
     staleTime: 60000, // Data will be considered fresh for 1 minute
   });
-  console.log(state.toLowerCase());
-  console.log(data);
 
   if (isLoading) {
     return <div>Loading...</div>;
