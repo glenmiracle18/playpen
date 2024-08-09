@@ -25,7 +25,7 @@ const FolderPage = () => {
     queryFn: () => getFilesAction({ folderId }),
     staleTime: 60000, // Data will be considered fresh for 1 minute
   });
-  console.log(data?.data?.data);
+  // console.log(data?.data?.data);
   const allFile = data?.data?.data;
 
   return (

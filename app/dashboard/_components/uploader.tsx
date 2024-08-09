@@ -45,28 +45,28 @@ const Uploader = ({ folderId }: UploaderProps) => {
 
   // handle upload state
   const { startUpload, isUploading } = useUploadThing("fileUploader", {
-    onClientUploadComplete: ([data]) => {
+    onClientUploadComplete: (res) => {
+      // the array of uploaded data is destructured form [data]]
+      // you can access the whole array from the res object
       toast({
         description: "✅ Upload coomplete",
       });
       setUploadComplete(true);
       // revalidatePath(`/folder/${folderId}`);
-      router.refresh();
 
-      console.log(data);
+      // contains the array of the uploaded data
+      console.log("uploaded data", res);
 
-      const filePath = data.url;
-      const payload: UploadFileType = {
-        values: {
-          file_name: data.name,
-          folder_id: folderId,
-          file_type: data.type,
-          file_size: data.size,
-          file_path: filePath,
-        }, // place the values in a payload
-      };
-      const result = execute({ values: payload.values });
-      setFileUrl(data.url);
+      const payload = res.map((data) => ({
+        file_name: data.name,
+        folder_id: folderId,
+        file_type: data.type,
+        file_size: data.size,
+        file_path: data.url,
+      }));
+
+      execute(payload);
+      setFileUrl(res[0].url); // Set the first file URL for preview (you might want to handle multiple URLs)
     },
     onUploadProgress(p) {
       setIsUploadProgress(p);

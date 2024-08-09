@@ -55,7 +55,7 @@ export const getFoldersAction = actionClient
       if (state?.toLowerCase() === "favorites") {
         folderQuery = {
           orderBy: {
-            created_at: "desc",
+            updated_at: "desc",
           },
           where: {
             user_id: user.id,
@@ -65,7 +65,7 @@ export const getFoldersAction = actionClient
       } else if (state?.toLowerCase() === "recents") {
         folderQuery = {
           orderBy: {
-            created_at: "desc",
+            updated_at: "desc",
           },
           where: {
             user_id: user.id,
@@ -131,40 +131,36 @@ export const getFilesAction = actionClient
   });
 
 // create/upload files actions
-const uploadFileSchema = z.object({
-  values: z.object({
+const uploadFileSchema = z.array(
+  z.object({
     folder_id: z.string(),
     file_path: z.string(),
     file_type: z.string(),
     file_size: z.number(),
     file_name: z.string(),
   }),
-});
+);
 export type UploadFileType = z.infer<typeof uploadFileSchema>;
 
 export const uploadFileAction = actionClient
   .schema(uploadFileSchema)
-  .action(async ({ parsedInput: { values } }) => {
+  .action(async ({ parsedInput }) => {
     try {
       const { getUser } = getKindeServerSession();
       const user = await getUser();
-
       if (!user || !user.id) {
         throw new Error("Unauthorized");
       }
 
-      const files = await prisma.file.create({
-        data: {
-          folder_id: values.folder_id,
-          file_path: values.file_path,
-          file_type: values.file_type,
-          file_name: values.file_name,
+      const files = await prisma.file.createMany({
+        data: parsedInput.map((value) => ({
+          ...value,
           user_id: user.id as string,
           is_shared: false,
-          file_size: values.file_size,
-        },
+        })),
       });
-      revalidatePath(`/dashboard/folder/${values.folder_id}`);
+
+      // revalidatePath(`/dashboard/folder/${parsedInput[0].folder_id}`);
       return { data: files };
     } catch (e) {
       console.log("Upload Files: ", e);
