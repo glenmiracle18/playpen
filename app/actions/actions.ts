@@ -310,6 +310,16 @@ export const shareFolder = actionClient
         throw new Error("Unauthorized");
       }
 
+      const alreadyShared = await prisma.shareFolder.findFirst({
+        where: {
+          folder_id: folderId,
+        },
+      });
+
+      if (alreadyShared) {
+        return { sharedLink: alreadyShared.public_link };
+      }
+
       const sharedFolder = await prisma.shareFolder.create({
         data: {
           folder_id: folderId,
@@ -327,7 +337,7 @@ export const shareFolder = actionClient
         },
       });
 
-      return sharedFolder.public_link;
+      return { sharedLink: sharedFolder.public_link };
     } catch (e) {
       console.log("Favorite folder: ", e);
       throw new Error("Internal Server Error");

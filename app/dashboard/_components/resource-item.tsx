@@ -20,6 +20,8 @@ import { toast } from "@/components/ui/use-toast";
 import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { ShareFolderSheet } from "./shareFolder-sheet";
 
 type ResourceItemProps = {
   name: string;
@@ -122,20 +124,12 @@ export const ResourceItem = ({ name, url, folder_id }: ResourceItemProps) => {
                   Add to favorites
                 </Button>
               </DropdownMenuItem>
+
+              {/* share folder sheet */}
               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                <Button
-                  variant="ghost"
-                  className="gap-2 items-center justify-start text-start"
-                  onClick={hanldedShare}
-                >
-                  <Share
-                    className={cn("h-4 w-4 mr-2", {
-                      "text-red-600 animate-pulse": isShared,
-                    })}
-                  />
-                  Share Folder
-                </Button>
+                <ShareFolderSheet folder_id={folder_id} />
               </DropdownMenuItem>
+
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                 <FileWarning className="h-4 w-4 mr-2" />
