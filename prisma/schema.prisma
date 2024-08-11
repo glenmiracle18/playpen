@@ -51,7 +51,7 @@ model Folder {
 model ShareFolder {
   shared_folder_id    String      @id @default(uuid())
   folder_id           String
-  shared_with_user_id String
+  shared_with_user_id String?
   public_link         String      @unique
   shared_at           DateTime    @default(now())
   access_level        AccessLevel

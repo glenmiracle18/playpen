@@ -13,8 +13,9 @@ import {
   EllipsisVertical,
   FileWarning,
   StarIcon,
+  Share,
 } from "lucide-react";
-import { markFavoriteFolderAction } from "@/app/actions/actions";
+import { markFavoriteFolderAction, shareFolder } from "@/app/actions/actions";
 import { toast } from "@/components/ui/use-toast";
 import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
@@ -27,7 +28,8 @@ type ResourceItemProps = {
 };
 
 export const ResourceItem = ({ name, url, folder_id }: ResourceItemProps) => {
-  const [addedToFav, setAddedToFav] = useState(false);
+  const [addedToFav, setAddedToFav] = useState<boolean>(false);
+  const [isShared, setIsShared] = useState<boolean>(false);
 
   const { execute, isExecuting } = useAction(markFavoriteFolderAction, {
     onSuccess() {
@@ -49,6 +51,33 @@ export const ResourceItem = ({ name, url, folder_id }: ResourceItemProps) => {
     e.stopPropagation();
     execute({ folder_id });
     setAddedToFav(true);
+  };
+
+  const {
+    execute: share,
+    isExecuting: isSharing,
+    result: sharedLink,
+  } = useAction(shareFolder, {
+    onSuccess() {
+      console.log(sharedLink);
+      toast({
+        description: "💚 folder has been shared",
+      });
+    },
+    onError(error) {
+      console.log("error", error);
+      toast({
+        variant: "destructive",
+        description: "failed to share folder",
+      });
+    },
+  });
+
+  const hanldedShare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    share({ folderId: folder_id });
+    setIsShared(true);
   };
 
   return (
@@ -91,6 +120,20 @@ export const ResourceItem = ({ name, url, folder_id }: ResourceItemProps) => {
                     })}
                   />
                   Add to favorites
+                </Button>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <Button
+                  variant="ghost"
+                  className="gap-2 items-center justify-start text-start"
+                  onClick={hanldedShare}
+                >
+                  <Share
+                    className={cn("h-4 w-4 mr-2", {
+                      "text-red-600 animate-pulse": isShared,
+                    })}
+                  />
+                  Share Folder
                 </Button>
               </DropdownMenuItem>
               <DropdownMenuSeparator />

@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { fileSchema, formSchema } from "../validations/folder-validation";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { constants } from "buffer";
+import { v4 as uuidv4 } from "uuid";
 
 // createFolder action
 export const createFolder = actionClient
@@ -296,15 +296,24 @@ export const shareFolder = actionClient
   .schema(
     z.object({
       folderId: z.string(),
-      userId: z.string(),
     }),
   )
-  .action(async ({ parsedInput: { folderId, userId } }) => {
+  .action(async ({ parsedInput: { folderId } }) => {
     try {
-      const sharedFolder = await prisma.sharedfolder.create({
+      // public link combination
+      const publicLink = uuidv4();
+
+      const { getUser } = getKindeServerSession();
+      const user = await getUser();
+
+      if (!user || !user.id) {
+        throw new Error("Unauthorized");
+      }
+
+      const sharedFolder = await prisma.shareFolder.create({
         data: {
           folder_id: folderId,
-          shared_with_user: userId,
+          shared_with_user_id: user.id,
           public_link: publicLink,
           access_level: "VIEW",
         },
@@ -313,9 +322,14 @@ export const shareFolder = actionClient
       // update the is_shared flag on the folder
       await prisma.folder.update({
         where: { folder_id: folderId },
-        data: { is_shared: true },
+        data: {
+          is_shared: true,
+        },
       });
 
       return sharedFolder.public_link;
-    } catch {}
+    } catch (e) {
+      console.log("Favorite folder: ", e);
+      throw new Error("Internal Server Error");
+    }
   });
