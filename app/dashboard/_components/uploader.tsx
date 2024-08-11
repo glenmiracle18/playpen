@@ -104,8 +104,15 @@ const Uploader = ({ folderId }: UploaderProps) => {
             accept={{
               "image/png": [".png"],
               "image/jpeg": [".jpeg"],
+              "video/mp4": [".mp4", ".mov"],
               "image/jpg": [".jpg"],
               "apllication/pdf": [".pdf"],
+              "audio/mpeg": [".mp3", ".wav", ".mp4a"],
+              // "text/csv": [".csv"],
+              // "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+              // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
+              // "application/vnd.openxmlformats-officedocument.presentationml.presentation": [".pptx"],
+              // "application/vnd.ms-powerpoint": [".ppt"],
             }}
             maxFiles={5}
             onDragEnter={() => setIsDragOver(true)}

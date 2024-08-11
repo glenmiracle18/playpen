@@ -12,6 +12,7 @@ import {
   BookmarkIcon,
   EllipsisVertical,
   FileWarning,
+  Music2,
   StarIcon,
 } from "lucide-react";
 import Image from "next/image";
@@ -21,6 +22,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { useAction } from "next-safe-action/hooks";
 import { cn } from "@/lib/utils";
+import { Video, FileCog } from "lucide-react";
 
 interface FileProps {
   file: File;
@@ -59,8 +61,55 @@ export const IndividualFile = ({ file }: FileProps) => {
   });
 
   const hanldedAddToFav = () => {
+    console.log(file);
+
     execute({ file_id });
     setAddedToFav(true);
+  };
+
+  const renderFileContent = () => {
+    switch (file.file_type) {
+      case "image/jpeg":
+      case "image/png":
+        return (
+          <Image
+            src={file.file_path}
+            alt={file.file_name}
+            width={300}
+            height={300}
+            className="object-cover w-full aspect-square transition-all group-hover:scale-105"
+          />
+        );
+      case "application/pdf":
+        return (
+          <div className="flex items-center justify-center w-full h-[334px] bg-gray-200">
+            <FileCog className="w-16 h-16 text-red-500" />
+          </div>
+        );
+      case "video/mp4":
+      case "video/webm":
+      case "video/mov":
+      case "video/quicktime":
+        return (
+          <div className="flex items-center justify-center w-full h-[334px] bg-gray-200">
+            <Video className="w-16 h-16 text-blue-500" />
+          </div>
+        );
+      case "audio/mpeg":
+      case "audio/wav":
+      case "audio/mp4":
+        return (
+          <div className="flex items-center justify-center w-full h-[334px] bg-gray-200">
+            <Music2 className="w-16 h-16 text-green-500" />
+          </div>
+        );
+      default:
+        return (
+          <div className="flex items-center justify-center w-full h-[334px] bg-gray-200">
+            <FileCog className="w-16 h-16 text-gray-500" />
+          </div>
+        );
+    }
   };
 
   return (
@@ -69,13 +118,8 @@ export const IndividualFile = ({ file }: FileProps) => {
         <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
           <span className="sr-only">View</span>
         </Link>
-        <Image
-          src={file.file_path}
-          alt="Image"
-          width={300}
-          height={300}
-          className="object-cover w-full aspect-square transition-all group-hover:scale-105"
-        />
+        {/* verify the file type */}
+        {renderFileContent()}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent group-hover:from-black/80 transition-all" />
         <div className="absolute top-2 right-2 z-20">
           <DropdownMenu>

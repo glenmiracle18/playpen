@@ -9,7 +9,7 @@ export const ourFileRouter = {
     image: { maxFileSize: "4GB", maxFileCount: 10 },
     pdf: { maxFileSize: "4GB", maxFileCount: 4 },
     video: { maxFileSize: "1GB", maxFileCount: 4 },
-    audio: { maxFileSize: "1024B", maxFileCount: 4 },
+    audio: { maxFileSize: "32GB", maxFileCount: 4 },
   })
     .middleware(async ({ req }) => {
       const { getUser } = getKindeServerSession();

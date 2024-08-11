@@ -291,3 +291,31 @@ export const getFavoriteFoldersAction = actionClient.action(async () => {
     throw new Error("Internal Server Error");
   }
 });
+
+export const shareFolder = actionClient
+  .schema(
+    z.object({
+      folderId: z.string(),
+      userId: z.string(),
+    }),
+  )
+  .action(async ({ parsedInput: { folderId, userId } }) => {
+    try {
+      const sharedFolder = await prisma.sharedfolder.create({
+        data: {
+          folder_id: folderId,
+          shared_with_user: userId,
+          public_link: publicLink,
+          access_level: "VIEW",
+        },
+      });
+
+      // update the is_shared flag on the folder
+      await prisma.folder.update({
+        where: { folder_id: folderId },
+        data: { is_shared: true },
+      });
+
+      return sharedFolder.public_link;
+    } catch {}
+  });
