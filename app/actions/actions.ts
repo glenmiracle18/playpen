@@ -61,6 +61,7 @@ export const getFoldersAction = actionClient
             user_id: user.id,
             is_favorite: true,
           },
+          cacheStrategy: { ttl: 60 },
         };
       } else if (state?.toLowerCase() === "recents") {
         folderQuery = {
@@ -317,14 +318,14 @@ export const shareFolder = actionClient
       });
 
       if (alreadyShared) {
-        return { sharedLink: alreadyShared.public_link };
+        return { sharedLink: alreadyShared.public_id };
       }
 
       const sharedFolder = await prisma.shareFolder.create({
         data: {
           folder_id: folderId,
           shared_with_user_id: user.id,
-          public_link: publicLink,
+          public_id: publicLink,
           access_level: "VIEW",
         },
       });
@@ -337,7 +338,7 @@ export const shareFolder = actionClient
         },
       });
 
-      return { sharedLink: sharedFolder.public_link };
+      return { sharedLink: sharedFolder.public_id };
     } catch (e) {
       console.log("Share folder: ", e);
       throw new Error("Internal Server Error");
@@ -357,13 +358,13 @@ export const getSharedFolderAction = actionClient
       // no need to verify if user is authenticated
       const sharedFolder = await prisma.shareFolder.findUnique({
         where: {
-          public_link: publickLinkId,
+          public_id: publickLinkId,
         },
       });
 
       return {
-        public_link: sharedFolder.public_link,
-        access_level: sharedFolder.access_level,
+        public_link: sharedFolder?.public_id,
+        access_level: sharedFolder?.access_level,
       };
     } catch (e) {
       console.log("Share folder: ", e);

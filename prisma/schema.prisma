@@ -52,7 +52,7 @@ model ShareFolder {
   shared_folder_id    String      @id @default(uuid())
   folder_id           String
   shared_with_user_id String?
-  public_link         String      @unique
+  public_id           String?     @unique
   shared_at           DateTime    @default(now())
   access_level        AccessLevel
   folder              Folder      @relation(fields: [folder_id], references: [folder_id])

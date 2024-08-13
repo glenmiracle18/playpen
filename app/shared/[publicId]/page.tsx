@@ -7,21 +7,21 @@ import { useEffect } from "react";
 
 const Shared = () => {
   const pathname = useParams();
-  const shareId = `${pathname.shareId}`;
-  console.log(shareId);
+  const publicId = `${pathname.publicId}`;
+  console.log(publicId);
 
   const { execute, result, isExecuting, hasErrored } = useAction(
     getSharedFolderAction,
     {
       onSuccess() {
-        console.log(result.data?.access_level);
+        console.log(result?.data);
       },
     },
   );
 
   useEffect(() => {
-    execute({ publickLinkId: shareId });
-  }, [shareId, execute]);
+    execute({ publickLinkId: publicId });
+  }, [publicId, execute]);
 
   if (isExecuting) {
     return (
@@ -41,8 +41,8 @@ const Shared = () => {
 
   return (
     <div>
-      <h1>ShareId: {result.data?.public_link}</h1>
-      <h1>AccessLevel: {result.data?.access_level}</h1>
+      <h1>PublicId: {result?.data?.public_link}</h1>
+      <h1>AccessLevel: {result?.data?.access_level}</h1>
     </div>
   );
 };
