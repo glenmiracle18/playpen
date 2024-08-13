@@ -347,7 +347,7 @@ export const shareFolder = actionClient
 
 // check if a folderId is shared
 
-export const getSharedFolderAction = actionClient
+export const getSharedFolderIdAction = actionClient
   .schema(
     z.object({
       publickLinkId: z.string(),
@@ -363,11 +363,39 @@ export const getSharedFolderAction = actionClient
       });
 
       return {
+        folder_id: sharedFolder?.folder_id,
         public_link: sharedFolder?.public_id,
         access_level: sharedFolder?.access_level,
       };
     } catch (e) {
       console.log("Share folder: ", e);
       throw new Error("Internal Server Error");
+    }
+  });
+
+// now get the folders
+export const getSharedFoldersAction = actionClient
+  .schema(
+    z.object({
+      folderId: z.string(),
+    }),
+  )
+  .action(async ({ parsedInput: { folderId } }) => {
+    try {
+      // no need to verify if user is authenticated
+
+      const folders = await prisma.folder.findMany({
+        where: {
+          folder_id: folderId,
+        },
+      });
+      // would rather just return it like this instead of NextResponse.json
+      return { data: folders };
+    } catch (e) {
+      console.error("Folders Error:", e);
+      return NextResponse.json(
+        { error: "Internal Server Error" },
+        { status: 500 },
+      );
     }
   });

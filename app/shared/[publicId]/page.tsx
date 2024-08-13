@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useAction } from "next-safe-action/hooks";
-import { getSharedFolderAction } from "@/app/actions/actions";
+import { getSharedFolderIdAction } from "@/app/actions/actions";
 import { useEffect } from "react";
 
 const Shared = () => {
@@ -11,7 +11,7 @@ const Shared = () => {
   console.log(publicId);
 
   const { execute, result, isExecuting, hasErrored } = useAction(
-    getSharedFolderAction,
+    getSharedFolderIdAction,
     {
       onSuccess() {
         console.log(result?.data);
