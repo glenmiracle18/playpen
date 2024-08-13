@@ -339,7 +339,34 @@ export const shareFolder = actionClient
 
       return { sharedLink: sharedFolder.public_link };
     } catch (e) {
-      console.log("Favorite folder: ", e);
+      console.log("Share folder: ", e);
+      throw new Error("Internal Server Error");
+    }
+  });
+
+// check if a folderId is shared
+
+export const getSharedFolderAction = actionClient
+  .schema(
+    z.object({
+      publickLinkId: z.string(),
+    }),
+  )
+  .action(async ({ parsedInput: { publickLinkId } }) => {
+    try {
+      // no need to verify if user is authenticated
+      const sharedFolder = await prisma.shareFolder.findUnique({
+        where: {
+          public_link: publickLinkId,
+        },
+      });
+
+      return {
+        public_link: sharedFolder.public_link,
+        access_level: sharedFolder.access_level,
+      };
+    } catch (e) {
+      console.log("Share folder: ", e);
       throw new Error("Internal Server Error");
     }
   });

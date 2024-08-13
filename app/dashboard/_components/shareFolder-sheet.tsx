@@ -13,27 +13,31 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Check, Copy, Share } from "lucide-react";
+import { Check, Copy, Send, Share, TicketX } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { shareFolder } from "@/app/actions/actions";
 import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface ShareFolderSheetProps {
   folder_id: string;
 }
 
 export function ShareFolderSheet({ folder_id }: ShareFolderSheetProps) {
-  const [isShared, setIsShared] = useState<boolean>(false);
+  const [isSharedLinkGenerated, setIsSharedLinkGenerated] =
+    useState<boolean>(false);
   const [sharedLink, setSharedLink] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState<boolean>(false);
 
+  // generate a shared link
   const { execute: share, isExecuting: isSharing } = useAction(shareFolder, {
     onSuccess(data) {
       setSharedLink(data?.data?.sharedLink); // Assuming the action returns { link: string }
-      setIsShared(true);
+      setIsSharedLinkGenerated(true);
       toast({
-        description: "💚 folder has been shared",
+        title: "💚 Folder has been shared",
+        description: "You can share this link with anyone to access the folder",
       });
     },
     onError(error) {
@@ -48,12 +52,12 @@ export function ShareFolderSheet({ folder_id }: ShareFolderSheetProps) {
   const handleShare = () => {
     share({ folderId: folder_id });
   };
-  const sharedUrl = `${process.env.NEXT_PUBLIC_APP_URL}/shared/${sharedLink}`;
 
+  const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL}/shared/${sharedLink}`;
   const handleCopy = async () => {
     if (sharedLink) {
       try {
-        await navigator.clipboard.writeText(sharedUrl);
+        await navigator.clipboard.writeText(sharedLink);
         setIsCopied(true);
         toast({
           description: "Link copied to clipboard",
@@ -69,6 +73,8 @@ export function ShareFolderSheet({ folder_id }: ShareFolderSheetProps) {
     }
   };
 
+  // TODO: Verify if the folder already exist in the shareFolder table and mutate the render accordingly
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -78,7 +84,7 @@ export function ShareFolderSheet({ folder_id }: ShareFolderSheetProps) {
         >
           <Share
             className={cn("h-4 w-4 mr-2", {
-              "text-red-600 animate-pulse": isShared,
+              "text-red-600 animate-pulse": isSharedLinkGenerated,
             })}
           />
           Share Folder
@@ -92,7 +98,7 @@ export function ShareFolderSheet({ folder_id }: ShareFolderSheetProps) {
           </SheetDescription>
         </SheetHeader>
         <div className="grid gap-4 py-4">
-          {!isShared ? (
+          {!isSharedLinkGenerated ? (
             <Button onClick={handleShare} disabled={isSharing}>
               {isSharing ? "Generating url..." : "Generate Share Link"}
             </Button>
@@ -104,24 +110,50 @@ export function ShareFolderSheet({ folder_id }: ShareFolderSheetProps) {
               <div className="flex flex-col gap-2 items-start">
                 <Input
                   id="shareLink"
-                  value={sharedUrl || ""}
+                  value={shareUrl || ""}
                   readOnly
                   className="col-span-3 w-full"
                 />
-                <Button onClick={handleCopy} variant="outline" size="icon">
-                  {isCopied ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </Button>
+                <span className="flex gap-4 items-center">
+                  <Button onClick={handleCopy} variant="outline" size="icon">
+                    {isCopied ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </Button>
+                  <Link
+                    href={shareUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button
+                      type="button"
+                      disabled={!isSharedLinkGenerated}
+                      variant="outline"
+                      className="gap-2 flex p-2 items-center text-green-500"
+                    >
+                      Visit <Send size="20" />
+                    </Button>
+                  </Link>
+                  <Button
+                    type="button"
+                    disabled
+                    variant="destructive"
+                    className="gap-2 flex p-2 items-center "
+                  >
+                    Destroy Link <TicketX size="20" />
+                  </Button>
+                </span>
               </div>
             </div>
           )}
         </div>
         <SheetFooter>
           <SheetClose asChild>
-            <Button type="button">Close</Button>
+            <Button type="button" className="mt-8">
+              Close
+            </Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

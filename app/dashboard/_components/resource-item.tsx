@@ -63,7 +63,7 @@ export const ResourceItem = ({ name, url, folder_id }: ResourceItemProps) => {
     onSuccess() {
       console.log(sharedLink);
       toast({
-        description: "💚 folder has been shared",
+        description: "you",
       });
     },
     onError(error) {
