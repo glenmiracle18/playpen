@@ -57,7 +57,7 @@ export function ShareFolderSheet({ folder_id }: ShareFolderSheetProps) {
   const handleCopy = async () => {
     if (sharedLink) {
       try {
-        await navigator.clipboard.writeText(sharedLink);
+        await navigator.clipboard.writeText(shareUrl);
         setIsCopied(true);
         toast({
           description: "Link copied to clipboard",

@@ -14,6 +14,7 @@ import Image from "next/image";
 import { useAction } from "next-safe-action/hooks";
 import { uploadFileAction, type UploadFileType } from "@/app/actions/actions";
 import { revalidatePath } from "next/cache";
+import { FileUpload } from "@/components/ui/file-upload";
 
 interface UploaderProps {
   folderId: string;
@@ -25,6 +26,7 @@ const Uploader = ({ folderId }: UploaderProps) => {
   const [uploadProgress, setIsUploadProgress] = useState<number>(0);
   const router = useRouter();
   const [isPending, setIsPending] = useTransition();
+  const [files, setFiles] = useState<File[]>([]);
   const { toast } = useToast();
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const { execute, result, isExecuting } = useAction(uploadFileAction, {
@@ -89,91 +91,101 @@ const Uploader = ({ folderId }: UploaderProps) => {
     setIsDragOver(false);
   };
 
+  const handleFileUpload = (files: File[]) => {
+    setFiles(files);
+    console.log(files);
+  };
+
   return (
-    <div>
-      <div
-        className={cn(
-          "relative h-[200px] flex-1 my-16 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:rounded-2xl flex flex-col justify-center items-center ",
-          { "ring-blue-900/25 bg-blue-900/10 border-dashed": isDragOver },
-        )}
-      >
-        <div className="relative flex flex-1 flex-col items-center justify-center w-[300px]">
-          <Dropzone
-            onDropRejected={onDropRejected}
-            onDropAccepted={onDropAccepted}
-            accept={{
-              "image/png": [".png"],
-              "image/jpeg": [".jpeg"],
-              "video/mp4": [".mp4", ".mov"],
-              "image/jpg": [".jpg"],
-              "apllication/pdf": [".pdf"],
-              "audio/mpeg": [".mp3", ".wav", ".mp4a"],
-              // "text/csv": [".csv"],
-              // "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
-              // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
-              // "application/vnd.openxmlformats-officedocument.presentationml.presentation": [".pptx"],
-              // "application/vnd.ms-powerpoint": [".ppt"],
-            }}
-            maxFiles={5}
-            onDragEnter={() => setIsDragOver(true)}
-            onDragLeave={() => setIsDragOver(false)}
-            multiple={true}
-          >
-            {({ getRootProps, getInputProps }) => (
-              <div
-                className="h-full w-full flex flex-col items-center justify-center"
-                {...getRootProps()}
-              >
-                <input {...getInputProps()} />
-
-                {isDragOver ? (
-                  <MousePointerSquareDashed className="size-6 text-zinc-500 mb-2" />
-                ) : isUploading || isPending ? (
-                  <Loader2 className="animate-spin size-6 text-zinc-500 mb-2" />
-                ) : (
-                  <ImageIcon className="size-6 text-zinc-500 mb-2" />
-                )}
-
-                <div className="flex flex-col justify-center mb-2 text-sm text-zinc-700">
-                  {isUploading ? (
-                    <div className="flex flex-col items-center">
-                      <p>Uploading...</p>
-                      <Progress
-                        value={uploadProgress}
-                        className="mt- w-40 h-2 bg-gray-300"
-                      />
-                      <p>{uploadProgress}%</p>
-                    </div>
-                  ) : isPending ? (
-                    <div className="flex flex-col items-center">
-                      <p>Redirecting, please wait ...</p>
-                    </div>
-                  ) : isDragOver ? (
-                    <p>
-                      <span className="font-semibold">Drop file here</span>
-                    </p>
-                  ) : (
-                    <p>
-                      <span className="font-semibold">Click to upload</span> or
-                      drag and drop
-                    </p>
-                  )}
-                </div>
-
-                {isPending ? null : (
-                  <p className="text-xs text-zinc-500">PNG, JPG, JPEG</p>
-                )}
-              </div>
-            )}
-          </Dropzone>
-          {/* TODO: add the functionality of adding mulitple or a single file and before uploading so that some files can be removed or still added */}
-          {/* <Button variant="outline" type="submit" className="mt-8">
-          Upload Files
-        </Button> */}
-        </div>
-      </div>
+    <div className="w-full max-w-4xl mx-auto min-h-96 border border-dashed bg-white dark:bg-black border-neutral-200 dark:border-neutral-800 rounded-lg">
+      <FileUpload folderId={folderId} />
     </div>
   );
+  // return (
+  //   <div>
+  //     <div
+  //       className={cn(
+  //         "relative h-[200px] flex-1 my-16 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:rounded-2xl flex flex-col justify-center items-center ",
+  //         { "ring-blue-900/25 bg-blue-900/10 border-dashed": isDragOver },
+  //       )}
+  //     >
+  //       <div className="relative flex flex-1 flex-col items-center justify-center w-[300px]">
+  //         <Dropzone
+  //           onDropRejected={onDropRejected}
+  //           onDropAccepted={onDropAccepted}
+  //           accept={{
+  //             "image/png": [".png"],
+  //             "image/jpeg": [".jpeg"],
+  //             "video/mp4": [".mp4", ".mov"],
+  //             "image/jpg": [".jpg"],
+  //             "apllication/pdf": [".pdf"],
+  //             "audio/mpeg": [".mp3", ".wav", ".mp4a"],
+  //             // "text/csv": [".csv"],
+  //             // "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+  //             // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
+  //             // "application/vnd.openxmlformats-officedocument.presentationml.presentation": [".pptx"],
+  //             // "application/vnd.ms-powerpoint": [".ppt"],
+  //           }}
+  //           maxFiles={5}
+  //           onDragEnter={() => setIsDragOver(true)}
+  //           onDragLeave={() => setIsDragOver(false)}
+  //           multiple={true}
+  //         >
+  //           {({ getRootProps, getInputProps }) => (
+  //             <div
+  //               className="h-full w-full flex flex-col items-center justify-center"
+  //               {...getRootProps()}
+  //             >
+  //               <input {...getInputProps()} />
+
+  //               {isDragOver ? (
+  //                 <MousePointerSquareDashed className="size-6 text-zinc-500 mb-2" />
+  //               ) : isUploading || isPending ? (
+  //                 <Loader2 className="animate-spin size-6 text-zinc-500 mb-2" />
+  //               ) : (
+  //                 <ImageIcon className="size-6 text-zinc-500 mb-2" />
+  //               )}
+
+  //               <div className="flex flex-col justify-center mb-2 text-sm text-zinc-700">
+  //                 {isUploading ? (
+  //                   <div className="flex flex-col items-center">
+  //                     <p>Uploading...</p>
+  //                     <Progress
+  //                       value={uploadProgress}
+  //                       className="mt- w-40 h-2 bg-gray-300"
+  //                     />
+  //                     <p>{uploadProgress}%</p>
+  //                   </div>
+  //                 ) : isPending ? (
+  //                   <div className="flex flex-col items-center">
+  //                     <p>Redirecting, please wait ...</p>
+  //                   </div>
+  //                 ) : isDragOver ? (
+  //                   <p>
+  //                     <span className="font-semibold">Drop file here</span>
+  //                   </p>
+  //                 ) : (
+  //                   <p>
+  //                     <span className="font-semibold">Click to upload</span> or
+  //                     drag and drop
+  //                   </p>
+  //                 )}
+  //               </div>
+
+  //               {isPending ? null : (
+  //                 <p className="text-xs text-zinc-500">PNG, JPG, JPEG</p>
+  //               )}
+  //             </div>
+  //           )}
+  //         </Dropzone>
+  //         {/* TODO: add the functionality of adding mulitple or a single file and before uploading so that some files can be removed or still added */}
+  //         {/* <Button variant="outline" type="submit" className="mt-8">
+  //         Upload Files
+  //       </Button> */}
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
 };
 
 export default Uploader;
