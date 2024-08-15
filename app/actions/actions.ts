@@ -346,8 +346,8 @@ export const shareFolder = actionClient
   });
 
 // check if a folderId is shared
-
-export const getSharedFolderIdAction = actionClient
+// folderId not folder itselft
+export const getSharedFolderMetadataAction = actionClient
   .schema(
     z.object({
       publickLinkId: z.string(),
@@ -360,12 +360,27 @@ export const getSharedFolderIdAction = actionClient
         where: {
           public_id: publickLinkId,
         },
+        include: {
+          folder: {
+            include: {
+              files: true,
+            },
+          },
+        },
       });
 
+      if (!sharedFolder) {
+        throw new Error("Shared folder not found");
+      }
+
+      console.log("Shared file: ", sharedFolder.folder.files);
+
       return {
-        folder_id: sharedFolder?.folder_id,
-        public_link: sharedFolder?.public_id,
-        access_level: sharedFolder?.access_level,
+        files: sharedFolder.folder.files,
+        folder_name: sharedFolder.folder.folder_name,
+        folder_id: sharedFolder.folder_id,
+        public_link: sharedFolder.public_id,
+        access_level: sharedFolder.access_level,
       };
     } catch (e) {
       console.log("Share folder: ", e);
@@ -397,5 +412,39 @@ export const getSharedFoldersAction = actionClient
         { error: "Internal Server Error" },
         { status: 500 },
       );
+    }
+  });
+
+// now get sharedFilesin the SharedFolder
+export const getSharedFilesAction = actionClient
+  .schema(
+    z.object({
+      folderId: z.string(),
+    }),
+  )
+  .action(async ({ parsedInput: { folderId } }) => {
+    try {
+      // no need to verify if user is authenticated
+
+      const files = await prisma.file.findMany({
+        where: {
+          folder_id: folderId,
+        },
+      });
+
+      const fileCount = files.length;
+      const totalSizeinBytes = files.reduce(
+        (sum, file) => sum + file.file_size,
+        0,
+      );
+
+      // convert total size to MB for readability
+      const totalSizeMB = totalSizeinBytes / (1024 * 1024);
+
+      // would rather just return it like this instead of NextResponse.json
+      return { data: files, fileCount, totalSizeMB: totalSizeMB.toFixed(2) };
+    } catch (e) {
+      console.error("File Error:", e);
+      throw new Error("File error");
     }
   });

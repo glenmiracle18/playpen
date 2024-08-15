@@ -12,7 +12,7 @@ import { ResourceItem } from "./resource-item";
 import { useQuery } from "@tanstack/react-query";
 
 interface AllFoldersProps {
-  state: string;
+  state?: string;
 }
 
 export const AllFolders = ({ state }: AllFoldersProps) => {
