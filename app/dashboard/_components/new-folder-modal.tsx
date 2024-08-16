@@ -76,7 +76,7 @@ export const NewFolderModal = ({ icon: Icon, label }: NewFolderModalProps) => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <div className="w-[150px] py-4 cursor-pointer hover:bg-gray-300/20 rounded-md gap-3 border h-auto px-4  group  flex flex-col items-start">
-          <Icon size="16" className="group-hover:text-red-400" />
+          <Icon size="16" className="group-hover:text-secondary" />
           <p className="text-xs">{label}</p>
         </div>
       </DialogTrigger>

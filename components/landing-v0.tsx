@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CheckIcon, CloudIcon } from "lucide-react";
 import { AuthLinks } from "@/components/atoms/auth-links";
+import Image from "next/image";
 
 export function LandingPage() {
   return (
@@ -16,12 +17,21 @@ export function LandingPage() {
           className="flex items-center gap-2 justify-center"
           prefetch={false}
         >
-          <CloudIcon className="h-12 w-12 text-primary" />
-          <h1 className="text-primary text-2xl font-serif font-semibold ">
-            Cloudy
-          </h1>
-
-          <span className="sr-only">Cloudly</span>
+          <Link href="/">
+            <span className="flex items-center gap-2">
+              <Image
+                src="/icon.png"
+                alt="logo"
+                width={50}
+                height={50}
+                className="cursor-pointer rounded-lg"
+                onClick={() => router.push("/")}
+              />
+              <h1 className="text-2xl text-primary font-semibold font-sans">
+                Cloudy
+              </h1>
+            </span>
+          </Link>
         </Link>
         <nav className="ml-auto flex items center gap-4 sm:gap-6">
           <Link

@@ -60,7 +60,6 @@ const FolderPage = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-        class
         <Link href="/dashboard">
           <Button variant="ghost" size="sm" className="my-4 w-28">
             <ArrowLeft className="mr-2 h-5 w-5" /> Back

@@ -131,9 +131,9 @@ export function ShareFolderSheet({ folder_id }: ShareFolderSheetProps) {
                       type="button"
                       disabled={!isSharedLinkGenerated}
                       variant="outline"
-                      className="gap-2 flex p-2 items-center text-green-500"
+                      className="gap-2 flex p-2 items-center text-primary"
                     >
-                      Visit <Send size="20" />
+                      Visit <Send size="16" className="text-primary" />
                     </Button>
                   </Link>
                   <Button

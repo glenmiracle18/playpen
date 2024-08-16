@@ -21,8 +21,8 @@ export const SidebarItem = ({
     >
       <Icon
         className={cn(
-          "text-gray-500 group-hover:text-red-400",
-          isActive && "text-red-400",
+          "text-gray-500 group-hover:text-primary",
+          isActive && "text-primary",
         )}
         size="22"
       />

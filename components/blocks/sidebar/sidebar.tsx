@@ -14,6 +14,7 @@ import { ProfileDropdown } from "./profile-dropdown";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export const Sidebar = () => {
   const [activeItem, setActiveItem] = useState<string>("Home");
@@ -29,6 +30,21 @@ export const Sidebar = () => {
   return (
     <div className="w-[260px] z-50 bg-gray-200/50 rounded-sm border-r left-0 flex flex-col justify-between h-screen p-4">
       <div className="flex flex-col gap-4 w-full ">
+        <Link href="/">
+          <span className="flex items-center gap-2">
+            <Image
+              src="/icon.png"
+              alt="logo"
+              width={50}
+              height={50}
+              className="cursor-pointer rounded-lg"
+              onClick={() => router.push("/")}
+            />
+            <h1 className="text-2xl text-primary font-semibold font-sans">
+              Cloudy
+            </h1>
+          </span>
+        </Link>
         <div className="mt-4 flex flex-col gap-2 w-full">
           {sidebarList.map((item, idx) => (
             <div

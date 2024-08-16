@@ -88,7 +88,7 @@ export const ResourceItem = ({ name, url, folder_id }: ResourceItemProps) => {
         <div className="flex justify-between items-center px-4">
           <Link href={url} className="flex-grow">
             <span className="flex items-center gap-[8px]">
-              <FolderIcon className="size-10 text-red-500 font-medium" />
+              <FolderIcon className="size-10 text-primary font-medium" />
               <div>
                 <h1 className="font-medium text-sm text-black">{name}</h1>
                 <h1 className="text-gray-300 text-xs">92MB</h1>
@@ -100,7 +100,7 @@ export const ResourceItem = ({ name, url, folder_id }: ResourceItemProps) => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="bg-none text-black hover:text-red-600 transition-colors"
+                className="bg-none text-black hover:text-primary transition-colors"
               >
                 <EllipsisVertical className="h-4 w-4" />
               </Button>
