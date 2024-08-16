@@ -3,6 +3,7 @@ import { Sidebar } from "@/components/blocks/sidebar/sidebar";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const queryClient = new QueryClient();
 import { ourFileRouter } from "@/app/api/uploadthing/core";
@@ -24,6 +25,7 @@ export default function Layout({
             <Sidebar />
             <div className="flex flex-col w-full">
               <Navbar />
+
               {children}
             </div>
           </div>
