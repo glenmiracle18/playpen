@@ -24,7 +24,7 @@ export function UserNav({ email, name, userImage }: iAppProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10">
+          <Avatar className="h-10 w-10 bg-ring ring-2 ring-primary animate-spin duration-1000 ring-offset-2">
             <AvatarImage src={userImage} alt="User Image" />
             <AvatarFallback className="uppercase">
               {name.slice(0, 3)}

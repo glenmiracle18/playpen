@@ -5,7 +5,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/user-nav";
 
-export async function AuthLinks() {
+export function AuthLinks() {
   return (
     <>
       <div className="flex gap-4">

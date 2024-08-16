@@ -21,6 +21,7 @@ import {
   StarIcon,
   Video,
   FileCog,
+  Download,
 } from "lucide-react";
 import { markFavoriteFilesAction } from "@/app/actions/actions";
 import type { File } from "@prisma/client";
@@ -124,6 +125,35 @@ export const IndividualFile = ({ file }: FileProps) => {
     file.file_id,
   );
 
+  const [downloading, setDownloading] = useState<boolean>(false);
+
+  const handleDownload = (file: File) => {
+    setDownloading(true);
+    fetch(file.file_path)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = file.file_name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        setDownloading(false);
+        toast({
+          description: "✅ File downloaded successfully",
+        });
+      })
+      .catch((error) => {
+        console.error("Error downloading file:", error);
+        toast({
+          variant: "destructive",
+          description: "Failed to download file",
+        });
+      });
+  };
+
   const truncatedTitle = useMemo(
     () => truncateTitle(file.file_name, WORD_LIMIT),
     [file.file_name],
@@ -152,12 +182,19 @@ export const IndividualFile = ({ file }: FileProps) => {
               <EllipsisVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>
+          <DropdownMenuContent align="end" className="cursor-pointer">
+            <DropdownMenuItem
+              className="text-primary cursor-pointer"
+              onSelect={() => handleDownload(file)}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              {downloading ? "Downloading..." : "Download"}
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer">
               <BookmarkIcon className="h-4 w-4 mr-2" />
               Save
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem asChild className="cursor-pointer">
               <Button
                 variant="ghost"
                 onClick={handleAddToFav}
@@ -172,7 +209,7 @@ export const IndividualFile = ({ file }: FileProps) => {
               </Button>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer">
               <FileWarning className="h-4 w-4 mr-2" />
               Report
             </DropdownMenuItem>

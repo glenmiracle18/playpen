@@ -9,6 +9,7 @@ import { useUploadThing } from "@/utils/uploadthing";
 import Dropzone, { type FileRejection } from "react-dropzone";
 import { useAction } from "next-safe-action/hooks";
 import { uploadFileAction } from "@/app/actions/actions";
+import Image from "next/image";
 
 const mainVariant = {
   initial: {
@@ -45,7 +46,7 @@ export const FileUpload = ({ folderId }: FileUploadProps) => {
   const { execute, result, isExecuting } = useAction(uploadFileAction, {
     onSuccess() {
       toast({
-        description: "✅ file written in db sucessfully",
+        description: "✅ Upload complete",
       });
       window.location.reload(); // this is a hack, I should use react-query to refetch the data
       // router.refresh
@@ -63,9 +64,9 @@ export const FileUpload = ({ folderId }: FileUploadProps) => {
     onClientUploadComplete: (res) => {
       // the array of uploaded data is destructured form [data]]
       // you can access the whole array from the res object
-      toast({
-        description: "✅ Upload coomplete",
-      });
+      // toast({
+      //   description: "✅ Upload coomplete",
+      // });
       setUploadComplete(true);
       // revalidatePath(`/folder/${folderId}`);
 
@@ -230,7 +231,18 @@ export const FileUpload = ({ folderId }: FileUploadProps) => {
                     <IconUpload className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
                   </motion.p>
                 ) : (
-                  <IconUpload className="h-4 w-4 text-neutral-600 dark:text-neutral-300" />
+                  <span className="flex flex-col gap-2 items-center">
+                    <Image
+                      src="/icon.png"
+                      alt="logo"
+                      width={50}
+                      height={50}
+                      className="cursor-pointer rounded-lg"
+                    />
+                    <p className="text-primary text-md font-light font-serif">
+                      Drop Here
+                    </p>
+                  </span>
                 )}
               </motion.div>
             )}

@@ -25,7 +25,6 @@ export function LandingPage() {
                 width={50}
                 height={50}
                 className="cursor-pointer rounded-lg"
-                onClick={() => router.push("/")}
               />
               <h1 className="text-2xl text-primary font-semibold font-sans">
                 Cloudy
@@ -348,7 +347,7 @@ export function LandingPage() {
       <footer className="bg-muted p-6 md:py-12 w-full">
         <div className="container max-w-7xl grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 text-sm">
           <div className="grid gap-1">
-            <h3 className="font-semibold">Company</h3>
+            <h3 className="font-semibold">Made with 💙 by Glen</h3>
           </div>
         </div>
       </footer>
