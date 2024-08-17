@@ -3,9 +3,7 @@ import { Sidebar } from "@/components/blocks/sidebar/sidebar";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ThemeProvider } from "@/components/theme-provider";
 
-const queryClient = new QueryClient();
 import { ourFileRouter } from "@/app/api/uploadthing/core";
 import { Toaster } from "@/components/ui/toaster";
 import ReactQueryProvider from "@/lib/react-query-provider";

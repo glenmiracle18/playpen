@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -27,7 +25,7 @@ export function LandingPage() {
                 className="cursor-pointer rounded-lg"
               />
               <h1 className="text-2xl text-primary font-semibold font-sans">
-                Cloudy
+                Filewave
               </h1>
             </span>
           </Link>
@@ -35,14 +33,14 @@ export function LandingPage() {
         <nav className="ml-auto flex items center gap-4 sm:gap-6">
           <Link
             href="#"
-            className="text-sm font-medium items-center hover:underline underline-offset-4"
+            className="hidden text-sm font-medium items-center hover:underline underline-offset-4"
             prefetch={false}
           >
             Features
           </Link>
           <Link
             href="#"
-            className="items-center text-sm font-medium hover:underline underline-offset-4"
+            className="hidden items-center text-sm font-medium hover:underline underline-offset-4"
             prefetch={false}
           >
             Pricing
@@ -66,7 +64,7 @@ export function LandingPage() {
                 </div>
                 <div className="flex flex-col gap-4 py-4 min-[400px]:flex-row">
                   <Link
-                    href="#"
+                    href="/dashboard"
                     className="inline-flex  h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
                     prefetch={false}
                   >

@@ -83,7 +83,7 @@ export const ResourceItem = ({ name, url, folder_id }: ResourceItemProps) => {
   };
 
   return (
-    <div className="cursor-pointer p-2 gap-2 w-[280px] md:w-[350px]">
+    <div className="cursor-pointer p-2 gap-2 w-full md:w-[350px]">
       <div className="hover:bg-gray-400/20 bg-gray-300/20 justify-center items-center py-4 px-2 rounded-xl">
         <div className="flex justify-between items-center px-4">
           <Link href={url} className="flex-grow">

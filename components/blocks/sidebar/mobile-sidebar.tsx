@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-export const Sidebar = () => {
+export const MobileSidebar = () => {
   const [activeItem, setActiveItem] = useState<string>("Home");
   const router = useRouter();
 
@@ -32,7 +32,7 @@ export const Sidebar = () => {
   return (
     <div
       className={cn(
-        "lg:w-[260px]  hidden z-50 bg-gray-200/50 rounded-sm border-r left-0 lg:flex flex-col justify-between h-screen p-4",
+        "w-full z-50  left-0 lg:flex flex-col justify-between h-full p-4 gap-20",
       )}
     >
       <div className="flex flex-col gap-4 w-full ">
@@ -47,7 +47,7 @@ export const Sidebar = () => {
               onClick={() => router.push("/")}
             />
             <h1 className="text-2xl text-primary font-semibold font-sans">
-              Filewave
+              Cloudy
             </h1>
           </span>
         </Link>

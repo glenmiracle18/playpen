@@ -12,6 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ResourceItem } from "@/app/dashboard/_components/resource-item";
 import { IndividualFile } from "@/app/dashboard/_components/file";
 import { SharedFolders } from "@/components/blocks/shared-folders";
+import Image from "next/image";
 
 const Shared = () => {
   const pathname = useParams();
@@ -51,14 +52,6 @@ const Shared = () => {
   const fileCount = `${data?.data?.fileCount}`;
   const sizeInMB = `${data?.data?.totalSizeMB}`;
 
-  if (isLoading || isExecuting) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <h1 className="animate-pulse text-3xl">Loading...</h1>
-      </div>
-    );
-  }
-
   if (isError || hasErrored) {
     return (
       <div>
@@ -69,7 +62,19 @@ const Shared = () => {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full ">
+      {isLoading && (
+        <div className="flex animate-pulse flex-col items-center justify-center h-screen gap-4">
+          <p>Loading...</p>
+          <Image
+            src="/loading.png"
+            width="350"
+            height="350"
+            alt="Hero"
+            className=""
+          />
+        </div>
+      )}
       <div className="flex w-full flex-col min-h-screen bg-muted/40">
         <Header folderName={result?.data?.folder_name} />
 
@@ -94,7 +99,7 @@ const Header = ({ folderName }: { folderName: string }) => {
       <div className="container max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">{folderName}</h1>
+            <h1 className="text-2xl font-bold capitalize">{folderName}</h1>
             <p className="text-muted-foreground">
               Explore the images shared with you in this folder.
             </p>

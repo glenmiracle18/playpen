@@ -14,6 +14,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTrigger,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { ArrowLeft, Loader2, UploadIcon } from "lucide-react";
 import Link from "next/link";
@@ -46,14 +47,19 @@ const FolderPage = () => {
               Upload
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[800px]">
+          <DialogContent className="md:max-w-[800px] max-w-[400px] ">
+            <DialogTitle className="hidden md:hidden">Upload</DialogTitle>
             <DialogHeader>Select files to upload</DialogHeader>
             <Uploader folderId={folderId} />
           </DialogContent>
         </Dialog>
         <span className="flex items-center gap-4">
           <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="my-4 w-28">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="my-4 w-28 hidden md:flex"
+            >
               <ArrowLeft className="mr-2 h-5 w-5" /> Back
             </Button>
           </Link>

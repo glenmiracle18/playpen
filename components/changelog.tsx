@@ -1,13 +1,27 @@
 import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
+import Link from "next/link";
 
 export function Changelog() {
   return (
     <div className="px-4 py-6 md:px-6 md:py-12 lg:py-16">
-      <div className="prose prose-gray mx-auto max-w-4xl dark:prose-invert">
-        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
+      <span className="flex items-center gap-4 pl-[250px]">
+        <Link href="/dashboard">
+          <Image
+            src="/icon.png"
+            alt="logo"
+            width={50}
+            height={50}
+            className="cursor-pointer rounded-lg"
+          />
+        </Link>
+        <h1 className="text-4xl font-extrabold max-w-4xl  text-primary tracking-tight lg:text-5xl">
           Changelog
         </h1>
-        <p className="text-muted-foreground">
+      </span>
+      <Separator className="my-4" />
+      <div className="prose prose-gray mx-auto max-w-4xl dark:prose-invert">
+        <p className="py-2 text-muted-foreground">
           Stay up-to-date with the latest changes and improvements to our
           platform.
         </p>

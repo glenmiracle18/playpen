@@ -144,13 +144,6 @@ export function ShareFolderSheet({ folder_id }: ShareFolderSheetProps) {
             </div>
           )}
         </div>
-        <SheetFooter>
-          <SheetClose asChild>
-            <Button type="button" className="mt-8">
-              Close
-            </Button>
-          </SheetClose>
-        </SheetFooter>
       </SheetContent>
     </Sheet>
   );
