@@ -1,18 +1,13 @@
 "use client";
 
-import { useTransition } from "react";
 import { useState } from "react";
-import Uploader from "./_components/uploader";
-import { CreationCard } from "./_components/craetion-cards";
 import {
   BookmarkPlus,
   FilePlus,
   FolderPlus,
-  Plus,
   UserRoundPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ResourceItem } from "./_components/resource-item";
 import { NewFolderModal } from "./_components/new-folder-modal";
 import { AllFolders } from "./_components/all-folders";
 
@@ -42,13 +37,6 @@ const DashboardPage = () => {
     <div className=" p-4 mt-4 gap-4 mr-2 ml-4 flex flex-col">
       <NewFolderModal label="New Folder" icon={FolderPlus} />
 
-      {/* TODO: check this in the future */}
-      {/* <div className="flex items-center gap-4">
-        {creationList.map((item, idx) => (
-          <CreationCard key={idx} label={item.label} icon={item.icon} />
-        ))}
-      </div> */}
-
       <div className="mt-4 flex flex-col gap-4">
         <h1 className="text-sm font-semibold">All Folders</h1>
 
@@ -77,5 +65,3 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
-
-const resourceList = [1, 2, 3, 4, 5, 6, 7, 8];

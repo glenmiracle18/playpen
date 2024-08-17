@@ -10,6 +10,7 @@ import { useAction } from "next-safe-action/hooks";
 import { useEffect } from "react";
 import { ResourceItem } from "./resource-item";
 import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
 
 interface AllFoldersProps {
   state?: string;
@@ -33,10 +34,6 @@ export const AllFolders = ({ state }: AllFoldersProps) => {
     staleTime: 60000, // Data will be considered fresh for 1 minute
   });
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   if (isError) {
     console.log(error);
     return <div>Error loading folders</div>;
@@ -46,6 +43,18 @@ export const AllFolders = ({ state }: AllFoldersProps) => {
   return (
     // TODO: add scroll bar and static element
     <div className="mt-4 grid md:grid-cols-2 lg:grid-cols-2 gap-2 grid-cols-1 ">
+      {isLoading && (
+        <div className="flex animate-pulse flex-col items-center justify-center gap-4 h-[500px]">
+          <p>Loading...</p>
+          <Image
+            src="/loading.png"
+            width="350"
+            height="350"
+            alt="Hero"
+            className=""
+          />
+        </div>
+      )}
       {data?.data?.data?.map((folder, idx) => (
         <ResourceItem
           url={`/dashboard/folder/${folder.folder_id}`}

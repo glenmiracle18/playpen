@@ -7,6 +7,7 @@ import {
   SheetContent,
   SheetHeader,
   SheetTrigger,
+  SheetTitle,
 } from "@/components/ui/sheet";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 
@@ -35,7 +36,7 @@ const Navbar = () => {
             </button>
           </SheetTrigger>
           <SheetContent side="left" className="h-screen">
-            <SheetHeader>Menu</SheetHeader>
+            <SheetTitle>Menu</SheetTitle>
             <MobileSidebar />
           </SheetContent>
         </Sheet>
