@@ -7,6 +7,7 @@ import {
   Settings,
   LayoutGrid,
   GitPullRequestCreateArrow,
+  Trash,
 } from "lucide-react";
 import { SidebarItem } from "./sidebar-item";
 import { ProfileDropdown } from "./profile-dropdown";
@@ -85,7 +86,8 @@ export const Sidebar = () => {
 
 const sidebarList = [
   { icon: Home, label: "Home", path: "/dashboard" },
-  { icon: ScanFace, label: "My Projects", path: "/dashboard/myprojects" },
   { icon: Folder, label: "Folders", path: "/dashboard/myprojects" },
-  { icon: LayoutGrid, label: "All Files", path: "/dashboard/myprojects" },
+  { icon: LayoutGrid, label: "All Files", path: "/dashboard/all-files" },
+  { icon: ScanFace, label: "Projects", path: "/dashboard/scan" },
+  { icon: Trash, label: "Trash", path: "/dashboard/trash" },
 ];

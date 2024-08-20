@@ -448,3 +448,58 @@ export const getSharedFilesAction = actionClient
       throw new Error("File error");
     }
   });
+
+export const getAllFilesAction = actionClient.action(async () => {
+  try {
+    const { getUser } = getKindeServerSession();
+    const user = await getUser();
+
+    if (!user || !user.id) {
+      throw new Error("Unauthorized");
+    }
+    const files = await prisma.file.findMany();
+
+    const fileCount = files.length;
+    const totalSizeinBytes = files.reduce(
+      (sum, file) => sum + file.file_size,
+      0,
+    );
+
+    // convert total size to MB for readability
+    const totalSizeMB = totalSizeinBytes / (1024 * 1024);
+
+    // would rather just return it like this instead of NextResponse.json
+    return { data: files, fileCount, totalSizeMB: totalSizeMB.toFixed(2) };
+  } catch (e) {
+    console.error("File Error:", e);
+    throw new Error("File error");
+  }
+});
+
+export const deleteFileAction = actionClient
+  .schema(
+    z.object({
+      fileId: z.string(),
+    }),
+  )
+  .action(async ({ parsedInput: { fileId } }) => {
+    try {
+      const { getUser } = getKindeServerSession();
+      const user = await getUser();
+
+      if (!user || !user.id) {
+        throw new Error("Unauthorized");
+      }
+
+      const deletedFile = await prisma.file.delete({
+        where: {
+          file_id: fileId,
+        },
+      });
+
+      return { data: deletedFile, success: true };
+    } catch (e) {
+      console.error("File Deletion Error", e);
+      throw new Error("File Deletion Error");
+    }
+  });

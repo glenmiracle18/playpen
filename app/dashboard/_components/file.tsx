@@ -1,9 +1,11 @@
+"use client";
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAction } from "next-safe-action/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -23,7 +25,11 @@ import {
   FileCog,
   Download,
 } from "lucide-react";
-import { markFavoriteFilesAction } from "@/app/actions/actions";
+import {
+  markFavoriteFilesAction,
+  deleteFileAction,
+} from "@/app/actions/actions";
+
 import type { File } from "@prisma/client";
 
 const WORD_LIMIT = 1;
@@ -159,6 +165,24 @@ export const IndividualFile = ({ file }: FileProps) => {
     [file.file_name],
   );
 
+  const handleFileDelete = () => {
+    const { data, isLoading, error, isSuccess } = useQuery({
+      queryKey: ["files"],
+      queryFn: () => deleteFileAction({ fileId: file_id }),
+      staleTime: 60000, // Data will be considered fresh for 1 minute
+    });
+
+    if (isSuccess) {
+      toast({
+        description: `✅ ${data?.data?.data?.file_name} deleted successfully`,
+      });
+    }
+
+    if (error) {
+      toast({ description: `❌ Error deleting the file` });
+    }
+  };
+
   const handleAddToFav = () => {
     addToFavorites();
     setAddedToFav(true);
@@ -206,6 +230,20 @@ export const IndividualFile = ({ file }: FileProps) => {
                   })}
                 />
                 Add to favorites
+              </Button>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="cursor-pointer">
+              <Button
+                variant="destructive"
+                onClick={handleFileDelete}
+                disabled={isExecuting || addedToFav}
+              >
+                <StarIcon
+                  className={cn("h-4 w-4 mr-2", {
+                    "text-red-600 animate-pulse": addedToFav,
+                  })}
+                />
+                Delete
               </Button>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
