@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -24,6 +25,7 @@ import {
   Video,
   FileCog,
   Download,
+  ShieldCloseIcon,
 } from "lucide-react";
 import {
   markFavoriteFilesAction,
@@ -31,6 +33,7 @@ import {
 } from "@/app/actions/actions";
 
 import type { File } from "@prisma/client";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 const WORD_LIMIT = 1;
 
@@ -62,13 +65,28 @@ const FileContent = ({ file }: { file: File }) => {
   switch (fileType) {
     case FileType.Image:
       return (
-        <Image
-          src={file.file_path}
-          alt={file.file_name}
-          width={300}
-          height={300}
-          className={commonClasses}
-        />
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className="relative w-full aspect-square overflow-hidden rounded-lg cursor-pointer">
+              <Image
+                src={file.file_path}
+                alt={file.file_name}
+                fill
+                className={commonClasses}
+              />
+            </div>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[80vw] sm:max-h-[80vh]">
+            <div className="relative w-full h-full aspect-auto">
+              <Image
+                src={file.file_path}
+                alt={file.file_name}
+                fill
+                className="object-contain"
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       );
     case FileType.PDF:
       return (
@@ -193,8 +211,10 @@ export const IndividualFile = ({ file }: FileProps) => {
       <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
         <span className="sr-only">View</span>
       </Link>
+      <div>
       <FileContent file={file} />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent group-hover:from-black/80 transition-all" />
+      </div>
+      
       <div className="absolute top-2 right-2 z-20">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
