@@ -10,6 +10,7 @@ import Dropzone, { type FileRejection } from "react-dropzone";
 import { useAction } from "next-safe-action/hooks";
 import { uploadFileAction } from "@/app/actions/actions";
 import Image from "next/image";
+import { getSignedURL } from "@/app/actions/s3action";
 
 const mainVariant = {
   initial: {
@@ -41,7 +42,9 @@ export const FileUpload = ({ folderId }: FileUploadProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadProgress, setIsUploadProgress] = useState<number>(0);
+  const [uploading, setUploading] = useState<boolean>(false);
   const [uploadComplete, setUploadComplete] = useState<boolean>(false);
+  const [statusMessage, setStatusMessage] = useState<string>("");
 
   const { execute, result, isExecuting } = useAction(uploadFileAction, {
     onSuccess() {
@@ -59,40 +62,75 @@ export const FileUpload = ({ folderId }: FileUploadProps) => {
     },
   });
 
-  // handle upload state
-  const { startUpload, isUploading } = useUploadThing("fileUploader", {
-    onClientUploadComplete: (res) => {
-      // the array of uploaded data is destructured form [data]]
-      // you can access the whole array from the res object
-      // toast({
-      //   description: "✅ Upload coomplete",
-      // });
-      setUploadComplete(true);
-      // revalidatePath(`/folder/${folderId}`);
+  // handle upload state with upthing
+  // const { startUpload, isUploading } = useUploadThing("fileUploader", {
+  //   onClientUploadComplete: (res) => {
+  //     // the array of uploaded data is destructured form [data]]
+  //     // you can access the whole array from the res object
+  //     // toast({
+  //     //   description: "✅ Upload coomplete",
+  //     // });
+  //     setUploadComplete(true);
+  //     // revalidatePath(`/folder/${folderId}`);
 
-      // contains the array of the uploaded data
-      console.log("uploaded data", res);
+  //     // contains the array of the uploaded data
+  //     console.log("uploaded data", res);
 
-      const payload = res.map((data) => ({
-        file_name: data.name,
-        folder_id: folderId,
-        file_type: data.type,
-        file_size: data.size,
-        file_path: data.url,
-      }));
+  //     const payload = res.map((data) => ({
+  //       file_name: data.name,
+  //       folder_id: folderId,
+  //       file_type: data.type,
+  //       file_size: data.size,
+  //       file_path: data.url,
+  //     }));
 
-      execute(payload);
-      // refresh the window
-    },
-    onUploadProgress(p) {
-      setIsUploadProgress(p);
-    },
-  });
+  //     execute(payload);
+  //     // refresh the window
+  //   },
+  //   onUploadProgress(p) {
+  //     setIsUploadProgress(p);
+  //   },
+  // });
+  //
 
-  const handleFileUpload = (files: File[]) => {
-    setFiles(files);
-    startUpload(files);
-    console.log(files);
+  const computeSHA256 = async (file: File) => {
+    const buffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    return hashHex;
+  };
+
+  const handleFileUpload = async (files: File[]) => {
+    try {
+      setUploading(true);
+      setFiles(files);
+      const checksum = await computeSHA256(files[0]);
+      const signedUrl = await getSignedURL(
+        files[0].type,
+        files[0].size,
+        checksum,
+        files[0].name,
+      );
+
+      const url = signedUrl.success?.url;
+
+      await fetch(url, {
+        method: "PUT",
+        body: files[0],
+        headers: {
+          "Content-Type": files[0].type,
+        },
+      });
+      setUploading(false);
+      console.log("success");
+    } catch (e) {
+      console.log(e);
+      setStatusMessage("Error uploading file");
+      setUploadComplete(false);
+    }
   };
 
   const handleFileChange = (newFiles: File[]) => {
@@ -109,7 +147,7 @@ export const FileUpload = ({ folderId }: FileUploadProps) => {
     noClick: true,
     onDrop: handleFileChange,
     onDropAccepted: (files) => {
-      startUpload(files);
+      handleFileUpload(files);
     },
 
     onDropRejected: (rejectedFiles: FileRejection[]) => {
@@ -144,14 +182,17 @@ export const FileUpload = ({ folderId }: FileUploadProps) => {
           <p className="relative z-20 font-sans font-normal text-neutral-400 dark:text-neutral-400 text-base mt-2">
             Drag or drop your files here or click to upload
           </p>
-          {isUploading && (
-            <div className="flex flex-col items-center">
-              <p>Uploading...</p>
-              <Progress
-                value={uploadProgress}
-                className="mt-4 w-40 h-2 bg-gray-300"
-              />
-              <p>{uploadProgress}%</p>
+
+          {uploading && (
+            <div className="absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center">
+              <div className="flex flex-col items-center justify-center">
+                <p className="text-neutral-700 dark:text-neutral-300 text-base font-bold">
+                  Uploading...
+                </p>
+                <p className="text-neutral-400 dark:text-neutral-400 text-base font-normal">
+                  Please wait
+                </p>
+              </div>
             </div>
           )}
 
