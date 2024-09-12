@@ -2,6 +2,7 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import prisma from "@/lib/db";
 
 const s3 = new S3Client({
   region: process.env.AWS_BUCKET_REGION!,
@@ -29,6 +30,7 @@ export async function getSignedURL(
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
+  // error handling
   if (!user) {
     throw new Error("Unauthorized");
   }
@@ -51,7 +53,10 @@ export async function getSignedURL(
       userId: user?.id,
     },
   });
+
   const signedUrl = await getSignedUrl(s3, putObjectCommand, { expiresIn: 60 });
 
+  console.log(signedUrl.split("?")[0])
+ 
   return { success: { url: signedUrl } };
 }
