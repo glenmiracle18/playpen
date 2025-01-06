@@ -4,12 +4,14 @@ import { motion } from "framer-motion";
 import { IconUpload } from "@tabler/icons-react";
 import { useDropzone } from "react-dropzone";
 import { Progress } from "@/components/ui/progress";
-import { toast } from "./use-toast";
+import { toast } from "../../../components/ui/use-toast";
 import { useUploadThing } from "@/utils/uploadthing";
 import Dropzone, { type FileRejection } from "react-dropzone";
 import { useAction } from "next-safe-action/hooks";
 import { uploadFileAction } from "@/app/actions/actions";
 import Image from "next/image";
+import { getSignedURL } from "@/app/actions/s3action";
+import { useRouter } from "next/navigation";
 
 const mainVariant = {
   initial: {
@@ -34,14 +36,20 @@ const secondaryVariant = {
 
 interface FileUploadProps {
   folderId: string;
-  // onChange?: (files: File[]) => void;
+  onUploadComplete: () => void;
+  onUploadError: () => void;
 }
 
-export const FileUpload = ({ folderId }: FileUploadProps) => {
+export const FileUpload = ({ folderId, onUploadComplete, onUploadError }: FileUploadProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploadProgress, setIsUploadProgress] = useState<number>(0);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [uploading, setUploading] = useState<boolean>(false);
   const [uploadComplete, setUploadComplete] = useState<boolean>(false);
+  const [statusMessage, setStatusMessage] = useState<string>("");
+  const [uploadFailed, setUploadFailed ] = useState<boolean>(false);
+
+  const router = useRouter();
 
   const { execute, result, isExecuting } = useAction(uploadFileAction, {
     onSuccess() {
@@ -59,40 +67,96 @@ export const FileUpload = ({ folderId }: FileUploadProps) => {
     },
   });
 
-  // handle upload state
-  const { startUpload, isUploading } = useUploadThing("fileUploader", {
-    onClientUploadComplete: (res) => {
-      // the array of uploaded data is destructured form [data]]
-      // you can access the whole array from the res object
-      // toast({
-      //   description: "✅ Upload coomplete",
-      // });
-      setUploadComplete(true);
-      // revalidatePath(`/folder/${folderId}`);
+  //  a secure sha256 endcoding of the image parsed as a checksum
+  const computeSHA256 = async (file: File) => {
+    const buffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer); // encoding the buffer using sha256
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    return hashHex;
+  };
+  // handle file upload to aws s3-bucket
+  const handleFileUpload = async (files: File[]) => {
+    try {
+      setUploading(true);
+      setFiles(files);
+      const checksum = await computeSHA256(files[0]);
 
-      // contains the array of the uploaded data
-      console.log("uploaded data", res);
+      // creates a signed url to aws for uploading
+      const signedUrl = await getSignedURL(
+        files[0].type,
+        files[0].size,
+        checksum,
+        files[0].name,
+      );
+      
+      const url = signedUrl.success?.url;
+      if (!url) {
+        throw new Error("Failed to get presigned url")
+      }
+      // log
+      console.log(url)
 
-      const payload = res.map((data) => ({
-        file_name: data.name,
-        folder_id: folderId,
-        file_type: data.type,
-        file_size: data.size,
-        file_path: data.url,
-      }));
+      // upload action with the signedurl
+      const xhr = new XMLHttpRequest();
+      xhr.open("PUT", url, true);
+      xhr.setRequestHeader("Content-Type", files[0].type);
 
-      execute(payload);
-      // refresh the window
-    },
-    onUploadProgress(p) {
-      setIsUploadProgress(p);
-    },
-  });
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = (event.loaded / event.total) * 100;
+          setUploadProgress(percentComplete);
+        }
+      };
 
-  const handleFileUpload = (files: File[]) => {
-    setFiles(files);
-    startUpload(files);
-    console.log(files);
+      xhr.onload = async function() {
+        if (xhr.status === 200) {
+          // File uploaded successfully, now create a new file in the database
+          const fileData = {
+            folder_id: folderId,
+            file_path: url.split("?")[0], // Remove query parameters
+            file_type: files[0].type,
+            file_size: files[0].size,
+            file_name: files[0].name,
+          };
+
+          const result = execute([fileData]) as unknown; // Cast to unknown first
+          if ((result as { data?: any }).data) { // Then cast to expected type
+            setUploading(false);
+            onUploadComplete(); // Call this to close the modal
+            router.refresh(); // Refresh the page to show the new file
+          } else {
+            throw new Error("Failed to create file in database");
+          }
+        } else { // if the upload failed
+          onUploadError();
+          toast({
+            description: "Upload Failed.",
+            variant: "destructive",
+          });
+          throw new Error("Upload failed");
+          
+        }
+      };
+
+      xhr.onerror = function() {
+        onUploadError();
+          toast({
+            description: "Upload Failed.",
+            variant: "destructive",
+          });
+        throw new Error("Upload failed");
+      };
+
+      xhr.send(files[0]);
+      
+    } catch (e) {
+      console.log(e);
+      setStatusMessage("Error uploading file");
+      setUploadComplete(false);
+    }
   };
 
   const handleFileChange = (newFiles: File[]) => {
@@ -109,7 +173,7 @@ export const FileUpload = ({ folderId }: FileUploadProps) => {
     noClick: true,
     onDrop: handleFileChange,
     onDropAccepted: (files) => {
-      startUpload(files);
+      handleFileUpload(files);
     },
 
     onDropRejected: (rejectedFiles: FileRejection[]) => {
@@ -138,22 +202,23 @@ export const FileUpload = ({ folderId }: FileUploadProps) => {
           <GridPattern />
         </div>
         <div className="flex flex-col items-center justify-center">
-          <p className="relative z-20 font-sans font-bold text-neutral-700 dark:text-neutral-300 text-base">
-            Upload file
-          </p>
+          {uploading ? (
+            <div className="flex flex-col items-center justify-center">
+              <p className="text-neutral-700 dark:text-neutral-300 text-base font-bold">
+                Uploading...
+              </p>
+              <p className="text-neutral-400 dark:text-neutral-400 text-base font-normal">
+                Please wait
+              </p>
+            </div>
+          ) : (
+            <p className="relative z-20 font-sans font-bold text-neutral-700 dark:text-neutral-300 text-base">
+              Upload File
+            </p>
+          )}
           <p className="relative z-20 font-sans font-normal text-neutral-400 dark:text-neutral-400 text-base mt-2">
             Drag or drop your files here or click to upload
           </p>
-          {isUploading && (
-            <div className="flex flex-col items-center">
-              <p>Uploading...</p>
-              <Progress
-                value={uploadProgress}
-                className="mt-4 w-40 h-2 bg-gray-300"
-              />
-              <p>{uploadProgress}%</p>
-            </div>
-          )}
 
           <div className="relative w-full mt-10 max-w-xl mx-auto">
             {files.length > 0 &&
@@ -256,9 +321,15 @@ export const FileUpload = ({ folderId }: FileUploadProps) => {
           </div>
         </div>
       </motion.div>
+      {uploading && (
+        <div className="mt-4 flex flex-col items-center justify-center">
+          <Progress value={uploadProgress} className="w-1/2" />
+          <p className="text-sm text-center mt-2">{Math.round(uploadProgress)}% uploaded</p>
+        </div>
+      )}
     </div>
   );
-};
+}
 
 export function GridPattern() {
   const columns = 41;

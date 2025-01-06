@@ -18,3 +18,5 @@ TECH
 -- same thing as last commit message (I'm not sure what I did)
 -- you know the drill. today I'm studying landchain and pinecone for an upcoming project.
 -- I'm not sure what I did
+
+I hate to write code
