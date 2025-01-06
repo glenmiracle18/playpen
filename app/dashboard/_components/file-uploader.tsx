@@ -37,15 +37,18 @@ const secondaryVariant = {
 interface FileUploadProps {
   folderId: string;
   onUploadComplete: () => void;
+  onUploadError: () => void;
 }
 
-export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
+export const FileUpload = ({ folderId, onUploadComplete, onUploadError }: FileUploadProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [uploading, setUploading] = useState<boolean>(false);
   const [uploadComplete, setUploadComplete] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string>("");
+  const [uploadFailed, setUploadFailed ] = useState<boolean>(false);
+
   const router = useRouter();
 
   const { execute, result, isExecuting } = useAction(uploadFileAction, {
@@ -67,14 +70,13 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
   //  a secure sha256 endcoding of the image parsed as a checksum
   const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer();
-    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer); // encoding the buffer using sha256
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
     return hashHex;
   };
-
   // handle file upload to aws s3-bucket
   const handleFileUpload = async (files: File[]) => {
     try {
@@ -89,11 +91,13 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
         checksum,
         files[0].name,
       );
-
+      
       const url = signedUrl.success?.url;
       if (!url) {
         throw new Error("Failed to get presigned url")
       }
+      // log
+      console.log(url)
 
       // upload action with the signedurl
       const xhr = new XMLHttpRequest();
@@ -118,7 +122,7 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
             file_name: files[0].name,
           };
 
-          const result = await execute([fileData]) as unknown; // Cast to unknown first
+          const result = execute([fileData]) as unknown; // Cast to unknown first
           if ((result as { data?: any }).data) { // Then cast to expected type
             setUploading(false);
             onUploadComplete(); // Call this to close the modal
@@ -126,16 +130,28 @@ export const FileUpload = ({ folderId, onUploadComplete }: FileUploadProps) => {
           } else {
             throw new Error("Failed to create file in database");
           }
-        } else {
+        } else { // if the upload failed
+          onUploadError();
+          toast({
+            description: "Upload Failed.",
+            variant: "destructive",
+          });
           throw new Error("Upload failed");
+          
         }
       };
 
       xhr.onerror = function() {
+        onUploadError();
+          toast({
+            description: "Upload Failed.",
+            variant: "destructive",
+          });
         throw new Error("Upload failed");
       };
 
       xhr.send(files[0]);
+      
     } catch (e) {
       console.log(e);
       setStatusMessage("Error uploading file");
@@ -338,5 +354,3 @@ export function GridPattern() {
     </div>
   );
 }
-
-
